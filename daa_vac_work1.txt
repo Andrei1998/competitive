@@ -1006,27 +1006,132 @@ Mergesort).
 Question 5
 
 
-TODO: Repair to use ternary comparisons................................
-(a) Consider the following procedure based on binary search:
+(a) Consider the following binary search procedure:
 
 SEARCH(A, l, r, v)
 Input: An array A with 2 indices l < r and a value v.
-Output: True / False depending on whether there exists l <= k < r s.t. A[k] = v
-    
-    // Edge case - length 1 array
-    if l + 1 == r
-        return A[l] == v
+Output: True / False depending on whether there exists l <= k < r s.t. A[k] = v  
     
     m = (l + r) / 2 // Compute the index of the middle element
     if v < A[m]     // If the searched value is smaller than the middle element
         return SEARCH(A, l, m, v) // Then, search in the left half of the array
-    else
-        return SEARCH(A, m, r, v) // Otherwise, discard the left half
+    else if v == A[m] // Otherwise, if it perfectly matches
+        return True   // Then, return True
+    else              // Otherwise search in the right half of the array
+        return SEARCH(A, m + 1, r, v)
 
-The runtime is given by T(n) = 1 + T((n + 1) / 2), which is O(log(n)) by the
+
+The runtime is given by T(n) = 1 + T(n / 2), which is O(log(n)) by the
 Master Theorem, but this is hiding away the constant factor, so one may directly
-expand it out into T(n) = the number of times one has to apply n -> (n + 1) / 2
-until they reach zero, implying that T(n) = log(n) + O(1).
+expand it out to get into T(n) = log2(n) + O(1).
 
 
-(b)
+(b) 
+
+
+
+(c) Two pointers approach:
+
+SOLVE(S, n, x)
+Input: An ordered array of real numbers S, of length n.
+       A real number x.
+Output: True / False, whether or not there are 2 distinct
+        elements a, b in S s.t. a + b = x.
+
+    j = n - 1
+    for i in [0, n)
+        // While the sum is too large, decrease j
+        while j > i and S[i] + S[j] > x
+            j = j - 1
+        // If we've reached equal elements,
+        // then there's no solution.
+        if S[i] == S[j]
+            return False
+        if S[i] + S[j] == x
+            return True
+    return False
+
+This runs in O(n) time, as the inner loop runs in amortized constant time, as
+j can only decrease.
+
+
+................................................................................
+
+
+Question 6
+
+(a) 0 -> 1 -> 2 -> 4 -> 9 -> 10
+    0 -> 2 -> 4 -> 9 -> 10
+   
+    
+(b) The minimal number of jumps is 4.
+    The solution is not unique:
+
+    0 -> 2 -> 4 -> 8 -> 10
+    0 -> 2 -> 4 -> 9 -> 10
+
+
+(c) Dynamic Programming is an algorithm design strategy for optimization
+problems. Solving a problem by Dynamic programming is done by identifying a
+collection of subprobems, tackling them in turn, smallest ones first,
+using the answer to smaller problems to work out larger ones,
+until all of them are solved. The principle of optimality: The optimal
+solution to a problem is a composite of optimal solutions to (some of) its
+subproblems.
+
+
+(d) Consider dp[pos] = The minimal number of moves necessary to reach position
+n - 1 starting at position pos.
+This array is defined for all 0 <= pos < n.
+
+Initialization: 
+Surely, dp[n - 1] = 0, as the goal has already been reached.
+
+Recurrence:
+
+dp[pos] = 1 + min over pos < k <= min(pos + A[pos], n - 1) of dp[k]
+
+Here we basically brute forced what the next move from pos is and picked the
+move which took fewer overall steps to complete the sequence.
+
+We'll compute dp in decreasing order of pos, the final answer is found in dp[0]:
+    dp[n - 1] = 0
+    for pos in [n - 2, 0]
+        dp[pos] = INF
+        for k in (pos, min(pos + A[pos], n - 1)]
+            dp[pos] = min(dp[pos], 1 + dp[k])
+    return dp[0]
+
+Total time complexity is O(n^2), which becomes tight for an array s.t. A[i]
+= INF, for all 0 <= i < n.
+
+
+(e) Consider maintaining an extra array father[pos] = the k which minimized
+dp[pos]. Then, by starting with x = 0, repeatedly performing x = father[x],
+until x = n - 1, and recording the x's which we pass through we can produce the
+answer sequence:
+
+    dp[n - 1] = 0
+    for pos in [n - 2, 0]
+        dp[pos] = INF
+        for k in (pos, min(pos + A[pos], n - 1)]
+            if 1 + dp[k] < dp[pos]
+                dp[pos] = 1 + dp[k]
+                father[pos] = k
+    
+    seq = []    // The answer sequence, initially empty
+    seq_l = 0   // The answer sequence's length
+    x = 0       // The position we're currently at
+    while x != n - 1
+        seq[seq_l] = x
+        seq_l = seq_l + 1
+        x = father[x]
+
+    return dp[0]
+
+
+
+
+ 
+
+

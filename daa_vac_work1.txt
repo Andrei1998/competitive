@@ -1124,7 +1124,7 @@ Note: The following greedy algorithm is linear:
     for i in [0, n)
         A[i] = min(A[i], n - 1)
 
-    l = r = ans 0
+    l = r = ans = 0
     while r < n - 1
         best = 0
         for i in [l, r]
@@ -1133,6 +1133,7 @@ Note: The following greedy algorithm is linear:
         r = best
         ans = ans + 1
     return ans
+
 
 (e) Consider maintaining an extra array father[pos] = the k which minimized
 dp[pos]. Then, by starting with x = 0, repeatedly performing x = father[x],

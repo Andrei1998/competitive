@@ -1043,6 +1043,7 @@ Pick an integer constant base >= 2 and run the following 2 part algorithm:
     
     log_2(m) * (1 + eps) + O(1) ternary comparisons, as required. 
 
+
 (c) Two pointers approach:
 
 SOLVE(S, n, x)

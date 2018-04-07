@@ -64,7 +64,7 @@ mathematical induction, P(k) holds for all k >= 1, as required.
 (c) When d = log_b(a), T(n) = O(n^d*log(n))
     When d > log_b(a), T(n) = O(n^d)
 
-Proceed by a recursion tree proof:
+Proceed by a Recursion Tree proof:
 
 The total work done on the 0th level is O(n^d).
 The total work done on the 1st level is O(a   * (n / b  )^d).
@@ -359,24 +359,6 @@ such that e in E'.
 Kruskal's using it. The found SP will be the maximum SP of the graph, as
 required.
 
-
-TI SE DA QUERY DE APM PE SUBGRAF, SE AFLII CEVA.
-TI SE DA QUERY DE APM PE SUBGRAF, SE AFLII CEVA.
-TI SE DA QUERY DE APM PE SUBGRAF, SE AFLII CEVA.
-TI SE DA QUERY DE APM PE SUBGRAF, SE AFLII CEVA.
-TI SE DA QUERY DE APM PE SUBGRAF, SE AFLII CEVA.
-TI SE DA QUERY DE APM PE SUBGRAF, SE AFLII CEVA.
-TI SE DA QUERY DE APM PE SUBGRAF, SE AFLII CEVA.
-TI SE DA QUERY DE APM PE SUBGRAF, SE AFLII CEVA.
-TI SE DA QUERY DE APM PE SUBGRAF, SE AFLII CEVA.
-TI SE DA QUERY DE APM PE SUBGRAF, SE AFLII CEVA.
-TI SE DA QUERY DE APM PE SUBGRAF, SE AFLII CEVA.
-TI SE DA QUERY DE APM PE SUBGRAF, SE AFLII CEVA.
-TI SE DA QUERY DE APM PE SUBGRAF, SE AFLII CEVA.
-TI SE DA QUERY DE APM PE SUBGRAF, SE AFLII CEVA.
-TI SE DA QUERY DE APM PE SUBGRAF, SE AFLII CEVA.
-TI SE DA QUERY DE APM PE SUBGRAF, SE AFLII CEVA.
-TI SE DA QUERY DE APM PE SUBGRAF, SE AFLII CEVA.
 
 (d) I claim that the path in the maximum SP of the graph is always the path
 we're seeking for. Computing this SP is easy, as explained in part (c). The
@@ -1026,9 +1008,40 @@ Master Theorem, but this is hiding away the constant factor, so one may directly
 expand it out to get into T(n) = log2(n) + O(1).
 
 
-(b) 
+(b) I will assume for simplicity that m > 0 (this can be decided at the
+beginning by comparing m with 0 once), the other major case m < 0 being solvable
+along the same reasoning lines with minor modifications.
+Pick an integer constant base >= 2 and run the following 2 part algorithm:
+    1. Find the smallest t such that base^t >= m:
+        t = 0
+        val = 1
+        while val < m
+            val = val * base
+            t = t + 1
 
+        This performs log_base(m) + O(1) ternary comparisons.
 
+    2. Binary search for the actual value of m in the range (base^(t - 1),
+       base^t]. This performs log_2(base^t - base^(t - 1)) + O(1) =
+       log_2(base^(t - 1) * (base - 1)) + O(1) = (t - 1) *  log_2(base)
+       + log_2(base - 1) + O(1)
+
+    Overall, the algorithm requires log_base(m) + (t - 1) * log_2(base) +
+    log_2(base - 1) + O(1) ternary comparisons. We know that t = log_base(m) +
+    O(1), so the algorithm requires log_base(m) + (log_base(m) - 1 + O(1)) *
+    log_2(base) + log_2(base - 1) + O(1) = log_base(m) + (log_base(m) + O(1)) *
+    log_2(base) + log_2(base - 1) + O(1) = log_base(m) + log_base(m) *
+    log_2(base) + log_2(base) * O(1) + log_2(base - 1) + O(1) =
+    log_base(m) + log_base(m) * log_2(base) + O(1) =
+    log_base(m) * (1 + log_2(base)) + O(1) =
+    (log_2(m) / log_2(base)) * (1 + log_2(base)) + O(1) = 
+    log_2(m) / log_2(base) + log_2(m) + O(1) =
+    log_2(m) * (1 + log_base(2)) + O(1)
+    
+    Denote log_base(2) by eps (which can get arbitrarily small by letting base
+    be arbitrarily large). We get:
+    
+    log_2(m) * (1 + eps) + O(1) ternary comparisons, as required. 
 
 (c) Two pointers approach:
 
@@ -1105,6 +1118,20 @@ We'll compute dp in decreasing order of pos, the final answer is found in dp[0]:
 Total time complexity is O(n^2), which becomes tight for an array s.t. A[i]
 = INF, for all 0 <= i < n.
 
+Note: The following greedy algorithm is linear:
+    // For simplicity
+    for i in [0, n)
+        A[i] = min(A[i], n - 1)
+
+    l = r = ans 0
+    while r < n - 1
+        best = 0
+        for i in [l, r]
+            best = max(best, A[i])
+        l = r + 1
+        r = best
+        ans = ans + 1
+    return ans
 
 (e) Consider maintaining an extra array father[pos] = the k which minimized
 dp[pos]. Then, by starting with x = 0, repeatedly performing x = father[x],
@@ -1130,8 +1157,145 @@ answer sequence:
     return dp[0]
 
 
+................................................................................
 
 
- 
+Question 7
 
+(a) A divide-and-conquer algorithm is one which is based on the divide-and
+conquer design strategy. The divide-and-conquer design strategy solves a problem
+by:
+
+1. Breaking the problem into "subproblems" - smaller instances of the same
+problem
+2. Recursively solving those subproblems
+[Base case: If the subproblems become small enough, just solve them by brute
+force.]
+3. Appropriately combining their answers.
+
+
+(b) (i) Assuming that merging two arrays, one of size n and another of size m
+takes time n + m, the time it takes to do all the merges is 2n + 3n + 4n + ...
++ kn = n * (2 + 3 + ... + k) = n * (k * (k + 1) / 2 - 1) = O(nk^2).
+
+
+(ii) Consider a function MERGE(A, i, j) which produces the merged version
+of arrays [i, j) by recursively computing MERGE(A, i, m) and MERGE(A, m, j)
+first (here m = (i + j) / 2) and then merging the two resulting arrays using
+the linear time merging algorithm. This follows the recurrence T(k) = nk +
+2T(k / 2). Via a Recursion Tree argument, where every level runs in O(nk) time
+complexity and there are O(log2(k)) levels, we can conclude that the whole
+algorithm runs in time O(nklog2(k)), a factor of k / log2(k) better than the
+previous algorithm.
+
+
+(c)   First, consider the auxiliary function:
+COUNT(A, i, j, val)
+Input: An array with 2 indices i < j, a value val 
+Output: The number of ks such that i <= k < j and A[k] = val
+    
+    cnt = 0
+    for all k in [i, j)
+        cnt += (A[k] == val)
+    return cnt
+
+Then, we solve the problem as follows:
+MAJORITY(A, i, j)
+Input:  An array with 2 indices i < j
+Output: The majority element of A[i .. j), if it exists, or an
+        arbitrary value otherwise
+
+    // Edge case, length 1 array
+    if i + 1 == j
+        return A[i]
+
+    p = (i + j) / 2
+    
+    m1 = MAJORITY(A, i, p + 1)
+    m2 = MAJORITY(A, p, j)
+
+    // The majority element of A[i .. j) is m1 or m2, whichever
+    // appears more often in A[i .. j)
+    cnt_m1 = COUNT(A, i, j, m1)
+    cnt_m2 = COUNT(A, i, j, m2)
+    if cnt_m1 > cnt_m2
+        return m1
+    else
+        return m2
+
+All that we've got left to do is check whether the answer returned by MAJORITY
+is, indeed, the MAJORITY element. This can be done in linear time by calling
+COUNT on the answer once, at the end.
+
+Correctness:
+Assuming inductively that MAJORITY works for smaller arrays, we need to show
+that it also works for A[i .. j). The important property this algorithm is based
+on is that, if A[i .. j) does have a majority element, then it has to be either
+of m1 or m2. Knowing this, together with the fact that the majority element has
+to be the most frequent element, returning m1 or m2, whichever is more frequent
+is surely the right choice.
+
+Complexity O(nlogn) based on having the same recurrence T(n) = 2T(n / 2) + O(n)
+as Mergesort (which in turn is easily proven via a Recursion Tree argument).
+
+
+................................................................................
+
+
+Question 8
+
+(a) A spanning tree (ST) of a connected graph G is a subgraph of G, T = (V, E')
+such that E' in E and T is a tree.
+By definition, all spanning trees of G are, nevertheless, trees on |V| vertices,
+thus all having exactly |V| - 1 edges, as all trees on |V| vertices do.
+
+
+(b) Starting from his hometown, a salesman will conduct a journey in which each
+target city is visited exactly once before he returns home.
+Given the pairwise distances between the cities, what is the best order in
+which to visit them, so as to minimize overall distance travelled.
+
+Solution: For a subset {0, j} in S in {0, ..., n - 1} define
+dp[S, j] = the length of the shortest simple path starting at
+0 and ending at j.
+
+dp[{0}, 0] = 0
+dp[S, j] = min{C[S - {j}, i] + dist(i, j) where i in S and i != j}
+
+To find the answer just compute min{dp[{0, ..., n - 1}, i] + dist(i, 0), where
+0 <= i < n}.
+
+dp will be computed in increasing order of cardinality of S,
+with all nonsensical states being initialized to INF.
+
+Time complexity: there are at most 2^n * n states, each one of them requiring
+O(n) time to compute, thus raising the total time complexity to O(2^n * n^2).  
+
+
+(c) Solve by Dynamic Programming:
+
+dp[k, S1, S2] = True / False whether or not it's possible to partition a1 ... ak
+into 3 parts A, B, C, such that A's sum is S1 and B's sum is S2 (C's sum thus
+being uniquely determined).
+
+Initialization:
+dp[0, 0, 0] = True
+dp[0, _, _] = False
+
+Recurrence: (For simplicity dp[_][<0][_] = dp[_][_][<0] = False)
+dp[k][S1][S2] =    dp[k - 1][S1][S2] 
+                or dp[k - 1][S1 - ak][S2]
+                or dp[k - 1][S1][S2 - ak]
+
+
+dp is computed in increasing order of k, breaking ties arbitrarily.
+
+By letting S = Sum(ai) / 3 the answer to our problem will be dp[n][S / 3][S / 3]
+(or False if S is not divisible by 3).
+In practice, some reindexing will be necessary for the second and third
+dimensions in order to accommodate negative sums (simply work with S1' = S1 + S,
+S2' = S2 + S as values for the second and third dimensions of dp).
+
+The total time complexity is proportional to the number of states of the
+recurrence - O(n * S^2).
 

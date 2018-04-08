@@ -5,14 +5,17 @@ Andrei-Costin Constantinescu
 ..........................................................................................
 -- Sheet 1 --
 
+
+Question 1
+
 (a)
 def smallestInCommon(a: Array[Int], N: Int, b: Array[Int], M: Int): Int = {
-	var i = 0; var j = 0
-	// Invariant: 0 <= i <= N and
-	//            0 <= j <= M and
+    var i = 0; var j = 0
+    // Invariant: 0 <= i <= N and
+    //            0 <= j <= M and
     //            a[0 .. i) together with b[0 .. j) are the smallest    
-   	//                      i + j elements in a and b considered together and 
-	//            there is no element common to a[0 .. i) and b[0 .. j).
+    //                      i + j elements in a and b considered together and 
+    //            there is no element common to a[0 .. i) and b[0 .. j).
 	while (i < N && j < M && a(i) != b(j)) {
 	    if (a(i) < b(j))
 	    	i = i + 1
@@ -29,18 +32,18 @@ the loop guards together with the invariant read 0 <= i < N, 0 <= j < M.
 
 (b) 
 def smallestInCommon(a: Array[Int], N: Int, b: Array[Int], M: Int): Option[Int] = {
-	var i = 0; var j = 0
-	// Invariant: 0 <= i <= N and
-	//            0 <= j <= M and
+    var i = 0; var j = 0
+    // Invariant: 0 <= i <= N and
+    //            0 <= j <= M and
     //            a[0 .. i) together with b[0 .. j) are the smallest
     //                      i + j elements in a and b considered together and 
-	//            there is no element common to a[0 .. i) and b[0 .. j).
-	while (i < N && j < M && a(i) != b(j)) {
-	    if (a(i) < b(j))
-		    i = i + 1
-	    else
-	    	j = j + 1
-	}
+    //            there is no element common to a[0 .. i) and b[0 .. j).
+    while (i < N && j < M && a(i) != b(j)) {
+       if (a(i) < b(j)) 
+            i = i + 1
+       else
+            j = j + 1
+    }
     
     // Test whether we've successfully found a common element    
     if (i < N && j < M && a(i) == b(j))
@@ -48,6 +51,150 @@ def smallestInCommon(a: Array[Int], N: Int, b: Array[Int], M: Int): Option[Int] 
     else
         None
 }
+
+
+(c)
+def smallestInCommon(a: Array[Int], N: Int, b: Array[Int], M: Int,
+                     c: Array[Int], L: Int): Int = {
+    var i = 0; var j = 0; var k = 0
+    // Invariant: 0 <= i <= N and
+    //            0 <= j <= M and
+    //            0 <= k <= L and
+    //            a[0 .. i), b[0 .. j) and c[0 .. k) together are the smallest
+    //                      i + j + k elements in a, b and c considered together and 
+    //            there is no element common to all a[0 .. i), b[0 .. j) and c[0 .. k).
+    while (i < N && j < M && k < L && !(a(i) == b(j) && a(i) == c(k))) {
+    	if (a(i) <= b(j) && a(i) <= c(k))
+    	    i = i + 1
+    	else if (b(j) <= a(i) && b(j) <= c(k))
+    	    j = j + 1
+    	else
+            k = k + 1
+    }
+    a(i) // We know that an answer surely exists, so this is well behaved
+}
+
+
+(d)
+def smallestInCommon(as: Array[Array[Int]], n: Array[Int]): Option[Int] = {
+    val m = as.size
+    val i = new Array[Int](m)
+    while (true) {
+        // Look for the smallest "head" of the arrays to increment
+        var minimum = (as(0)(i(0)), 0)
+        var allEqual = true
+        for (j <- 0 until m) {
+            if (i(j) >= n(j)) // If one of the arrays si finished
+                return None
+            if (as(j)(i(j)) != as(0)(i(0)))
+                allEqual = false
+            if (as(j)(i(j)) < minimum._1)
+                minimum = (as(j)(i(j)), j)
+        }
+    
+        if (allEqual)
+            return Some(minimum._1)
+        else
+            i(minimum._2) = i(minimum._2) + 1
+    }
+    Some(-1) // Should never reach this case
+}
+
+
+..........................................................................................
+
+
+Question 2
+
+(a) 
+def record(f: Int => Int, emit: Int => Unit): Unit = {
+    var maximum = f(1)
+    emit(1)
+    var n = 2
+
+    // Invariant: 1 < n and
+    //            maximum = max(f[1 .. n)) and
+    //            emit was called on all records in [1 .. n),
+    //            in ascending order, as required
+    while (true) {
+        var aux = f(n)
+        if (aux > maximum) {
+            maximum = aux
+            emit(n)
+        }
+        n = n + 1
+    }
+}
+
+
+(b)
+def divisors(n: Int): Int = {
+    var divs = 0
+    // Invariant: 1 <= i <= n + 1 and
+    //            divs = the number of divisors
+    //                   of n in range [1 .. i)
+    for (i <- 1 to n)
+        if (n % i == 0)
+            divs = divs + 1
+    divs
+}
+
+
+(c) Since divisors(n) runs in time O(n) and record will make one call to f = divisors
+for all i in [1 .. n], the total time is 1 + 2 + 3 + ... + n = n * (n + 1) / 2 = O(n^2),
+so we're dealing with a quadratic growth rate.
+
+
+(d) Say x is a divisor of n. Then, the only prime factors x may have are p1, p2, ..., pk.
+p1's exponent in x may be any integer in range [0 .. i1] - there are (i1 + 1) such choices
+p2's exponent in x may be any integer in range [0 .. i2] - there are (i2 + 1) such choices
+...
+pk's exponent in x may be any integer in range [0 .. ik] - there are (ik + 1) such choices
+
+Most importantly, any combination of these choices makes for a valid divisor of n.
+Therefore, by the product rule, n has (i1 + 1)(i2 + 1)...(ik + 1) divisors, as expected.
+
+
+(e)
+def divisors2(n: Int): Int = {
+    var divs = 1
+    var cpN = n
+    var p = 2
+    // Invariant: 2 <= p and
+    //            cpN = n without all of its
+    //                  prime factors < p and
+    //            divs = the number of divisors
+    //                   of n / cpN
+    while (p <= cpN) {
+        if (cpN % p == 0) { // p is prime for sure in this case
+            var cnt = 1
+            cpN = cpN / p
+            // Invariant: cnt = the number of p's in
+            //                  n / cpN's prime factorization
+            while (cpN % p == 0) {
+                cpN = cpN / p
+                cnt = cnt + 1
+            }
+            divs *= (cnt + 1)
+        }
+    }
+    divs
+}
+
+
+(f) The second function, divisors2, is, on average, much faster because most numbers have
+a few very small prime factors which will be removed from cpN on the first few iterations
+of the main while loop, thus greatly reducing the range p has to walk through, as well
+as the total number of division operations.
+
+
+..........................................................................................
+
+
+Question 4
+
+
+
 
 
 

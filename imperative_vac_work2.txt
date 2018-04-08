@@ -2,8 +2,52 @@ Imperative Programming Vacation Work
 Andrei-Costin Constantinescu
 
 
-................................................................................
+..........................................................................................
 -- Sheet 1 --
+
+(a)
+def smallestInCommon(a: Array[Int], N: Int, b: Array[Int], M: Int): Int = {
+	var i = 0; var j = 0
+	// Invariant: 0 <= i <= N and
+	//            0 <= j <= M and
+    //            a[0 .. i) together with b[0 .. j) are the smallest    
+   	//                      i + j elements in a and b considered together and 
+	//            there is no element common to a[0 .. i) and b[0 .. j).
+	while (i < N && j < M && a(i) != b(j)) {
+	    if (a(i) < b(j))
+	    	i = i + 1
+	    else
+		    j = j + 1
+	}
+	a(i) // We know that an answer surely exists, so this is well behaved
+}
+
+The program may never access elements of the arrays outside safe bounds
+because the only time when array accesses happen is inside the loop body, and
+the loop guards together with the invariant read 0 <= i < N, 0 <= j < M.
+
+
+(b) 
+def smallestInCommon(a: Array[Int], N: Int, b: Array[Int], M: Int): Option[Int] = {
+	var i = 0; var j = 0
+	// Invariant: 0 <= i <= N and
+	//            0 <= j <= M and
+    //            a[0 .. i) together with b[0 .. j) are the smallest
+    //                      i + j elements in a and b considered together and 
+	//            there is no element common to a[0 .. i) and b[0 .. j).
+	while (i < N && j < M && a(i) != b(j)) {
+	    if (a(i) < b(j))
+		    i = i + 1
+	    else
+	    	j = j + 1
+	}
+    
+    // Test whether we've successfully found a common element    
+    if (i < N && j < M && a(i) == b(j))
+        Some(a(i))
+    else
+        None
+}
 
 
 

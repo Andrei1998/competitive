@@ -191,10 +191,112 @@ as the total number of division operations.
 ..........................................................................................
 
 
+Question 3
+
+
+
+..........................................................................................
+
+
 Question 4
 
+(a)
+def swap(i: Int, j: Int): Unit = {
+    val aux = m(i)
+    m(i) = m(j)
+    m(j) = aux
+}
+
+def backswap(i: Int, j: Int, n: Int): Unit = {
+    if (n > 0) {
+        swap(i, j)
+        backswap(i + 1, j + 1, n - 1)
+    }
+}
 
 
+(b)
+def reverse(i: Int, n: Int): Unit = {
+    if (n > 1) {
+        swap(i, i + n - 1)
+        reverse(i + 1, n - 2)
+    }
+}
 
 
+(c) (i)  
+def rotate(i: Int, n: Int, k: Int): Unit = {
+    reverse(i, n - k)
+    reverse(i + n - k, k)
+    reverse(i, n)
+}
 
+
+(ii)
+def rotate(i: Int, n: Int, k: Int): Unit = {
+    if (0 < k && k < n) {
+        if (k < n - k) {
+            backswap(i, i + n - k, k)
+            rotate(i + k, n - k, k)
+        }
+        else {
+            backswap(i, i + k, n - k)
+            rotate(i, k, 2 * k - n)
+        }
+    }
+}
+
+
+(iii) Since (ii) is tail recursive, we can directly translate it
+into an iterative procedure:
+
+def rotate(_i: Int, _n: Int, _k: Int): Unit = {
+    var i = _i; var n = _n; var k = _k
+    while (0 < k && k < n) {
+        if (k < n - k) {
+            backswap(i, i + n - k, k)
+            i = i + k
+            n = n - k
+        }
+        else {
+            backswap(i, i + k, n - k)
+            val aux = k
+            k = 2 * k - n
+            n = aux
+        }
+    }
+}
+
+
+(iv) 
+def rotateBy1(i: Int, n: Int): Unit = {
+    val x: T = m(i + n - 1)
+    for (j <- i + n - 2 to i by -1)
+        m(j + 1) = m(j)
+    m(i) = x
+}
+
+def rotate(i: Int, n: Int, k: Int): Unit = {
+    if (k > 0) {
+        rotateBy1(i, n)
+        rotate(i, n, k - 1)
+    }
+}
+
+
+(d) For simplicity, I will count reads and writes together, naming both of them
+"accesses". Note that a swap operation takes 3 accesses.
+
+     (i)   In this case each element takes part in at most 2 swap operations. Thus the
+           total cost is 2 * 3 * n  = 6 * n accesses.
+(ii / iii) In this case one can note that with every swap operation executed by backswap
+           at least one of the two swapped elements ends up in its final position,
+           meaning there can be at most n backswap swap operations overall. In turn,
+           this means that the rotate procedure will use at most 3 * n access operations
+           overall.
+    (iv)   This is certainly the worst way to implement rotate. One rotateByOne call
+           uses up exactly n + 1 access operations. This means that rotate will make
+           exactly k * (n + 1) access operations, which is O(n^2) if k = O(n).
+           
+
+(f)   

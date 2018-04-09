@@ -638,4 +638,65 @@ additional memory.
 
 Question 1
 
+(a)
+Define Sum [j = a, j = b, expr(j)] = expr(a) + expr(a + 1) + ... + expr(b) and
+       Prod[j = a, j = b, expr(j)] = expr(a) * expr(a + 1) * ... * expr(b).
+
+
+def digsToInt(xs: Array[Int], bs: Array[Int]): Int = {
+    // Invariant: -1 <= i < N and
+    //            ans = Sum[j = i+1, j = N-1, xs(j) * Prod[k = i+1, k = j-1, bs(k)]]
+    var ans = 0
+    for (i <- N - 1 to 0 by -1)
+        ans = ans * bs(i) + xs(i)
+    ans
+}
+
+Initialization:
+i = N - 1, ans = 0, so the invariant holds true initially.
+
+Invariant maintenance:
+ans                 = Sum[j = i+1, j = N-1, xs(j) * Prod[k = i+1, k = j-1, bs(k)]]
+ans * bs(i)         = Sum[j = i+1, j = N-1, xs(j) * Prod[k = i,   k = j-1, bs(k)]]
+ans * bs(i) + xs(i) = Sum[j = i  , j = N-1, xs(j) * Prod[k = i,   k = j-1, bs(k)]]
+
+So, by executing ans = ans * bs(i) + xs(i), i = i - 1, the invariant is maintained.
+
+(b) 
+Pre: 0 <= n < Prod[j = 0, j = N - 1, bs(j)] 
+def IntToDigs(n: Int, bs: Array[Int]): Array[Int] = {
+    val xs = new Array[Int](N)
+    xs(0) = n
+    // Invariant 1 <= i <= N + 1 and
+    //           for all 0 <= j < i - 1 we have that 0 <= xs(j) < bs(j) and
+    //           digsToInt(xs, bs) = n
+    for (i <- 1 until N) {
+        xs(i)     = xs(i - 1) / bs(i - 1)
+        xs(i - 1) = xs(i - 1) % bs(i - 1)
+    }
+    xs
+}
+
+Initialization:
+i = 1, xs(0) = n, so the invariant holds true initially.
+
+Invariant maintenance:
+Note that performing xs(i) = xs(i - 1) / bs(i - 1), xs(i - 1) = xs(i - 1) % bs(i - 1)
+leaves digsToInt(xs, bs) unchanged, as it's simply turning any excess xs(i - 1) into
+a smaller amount in xs(i) (e.g. informally, it's exchanging many (>= 60) seconds for fewer
+(>= 1) minutes).
+With this in mind, coupled with the fact that xs(i - 1) < bs(i - 1) once
+xs(i - 1) %= bs(i - 1) has been executed, one can see how the invariant is being
+maintained.
+
+Now, overall correctness follows from the fact that n is bounded above (see precondition)
+such that the excess left at the end in xs(N - 1) is smaller than bs(N - 1).
+
+
+..........................................................................................
+
+
+Question 2
+
+(a)
 

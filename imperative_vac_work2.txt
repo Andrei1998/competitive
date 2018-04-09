@@ -540,11 +540,102 @@ Question 4
 
 (a)
 def longestFrom(i: Int, j: Int): Int = {
-    if (i < N && j < N && a(i) == b(j))
+    if (i < N && j < N && a(i) == a(j))
         1 + longestFrom(i + 1, j + 1)
     else
         0
 }
 
 
-(b) 
+(b)
+def longestRepeated = {
+    var ans(-1, -1, -1)
+    for (i <- 0 until N)
+        for (j <- i + 1 until N) {
+            val longestFr = longestFrom(i, j)
+            if (longestFr > ans._3)
+                ans = (i, j, longestFr)   
+        }
+    ans
+}
+
+Simply iterate all (i, j) pairs with i != j (WLOG i < j) and compute the largest k such
+that a[i .. (i + k)) = b[j .. (j + k)), by calling longestFrom(i, j). Record the pair
+(i, j) with the largest k and return the triplet (i, j, k).
+
+Time complexity: O(N^2 * bestk), because O(N^2) (i, j) pairs are being considered and the
+                 maximum time longestFrom takes to complete is bestk + O(1).
+
+
+(c) I will use standard terminology such as the suffix array and the LCP (longest common
+prefix).
+Consider the following (stronger) result:
+
+If str[0 .. M) are M words, then LCP(str[i], str[j]) with 0 <= i < j < M is maximized
+for an (i, j) pair such that i and j are consecutive when str is sorted in lexicographical
+order.
+
+To show this, assume WLOG that str is already sorted, then we need to show that
+LCP(i, j) can only be maximum when j = i + 1. This is immediate from the observation that
+LCP(i, i + 1) <= LCP(i, i + 2) <= ... <= LCP(i, M - 1), which is not hard to prove
+formally. But, for an informal argument, consider how words with a common prefix form
+a continuous subsequence in str and realize that, for this reason, the two words with the
+largest LCP have to be consecutive in the sorted order, as expected.
+
+
+(d)
+def before(i: Int, j: Int) = {
+    if (j >= N)
+        false
+    else if (i >= N)
+        true
+    else if (a(i) == a(j))
+        before(i + 1, j + 1)
+    else
+        a(i) < a(j)
+}
+
+This runs in time O(bestk) worst case.
+
+(e)
+def getSuffixArray = {
+    val suff = new Array[Int](Int)
+    for (i <- 0 until N)
+        suff(i) = i
+    val orderedSuffixes = suff.sortWith(before)
+    orderedSuffixes
+}
+
+
+(f)
+def longestRepeated = {
+    val suffixArray = getSuffixArray
+    ans = (-1, -1, -1)
+    for (i <- 0 until N - 1) {
+        val longestFr = longestFrom(suffixArray(i), suffixArray(i + 1))
+        if (longestFr > ans._3)
+            ans = (suffixArray(i), suffixArray(i + 1), longestFr)   
+    }
+    ans 
+}
+
+As guided by the previous parts, we compute the suffix array of a by calling the
+appropriate part (e) function and then only consider (i, i + 1) pairs, as showed to be
+enough in part (c). The total complexity is O(N * bestk * log N) for the suffix array and
+O(N * bestk) for the remaining checks, totalling to O(N * bestk * log N).
+
+Note: 
+There are numerous linear time algorithms for computing the suffix array, such as the
+classical "mod 3" divide-and-conquer algorithm. Afterwards, the LCP's of the consecutive
+entries in the suffix array are known as the "LCP array". Kasai's algorithm is an
+ingenious 5 lines long algorithm for computing the LCP array in linear time with constant
+additional memory.
+
+
+..........................................................................................
+-- Sheet 3 --
+
+
+Question 1
+
+

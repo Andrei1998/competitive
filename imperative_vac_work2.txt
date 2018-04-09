@@ -193,6 +193,8 @@ as the total number of division operations.
 
 Question 3
 
+No supposed to be attempted, as it's part of last year's IP2 paper (which is a course
+we're still to study in the term to come).
 
 
 ..........................................................................................
@@ -297,6 +299,28 @@ def rotate(i: Int, n: Int, k: Int): Unit = {
     (iv)   This is certainly the worst way to implement rotate. One rotateByOne call
            uses up exactly n + 1 access operations. This means that rotate will make
            exactly k * (n + 1) access operations, which is O(n^2) if k = O(n).
-           
 
-(f)   
+
+(f) This has been misplaced, it actually belongs to Question 3 above.
+
+
+..........................................................................................  
+-- Sheet 2 --
+
+
+Question 1
+
+class Tree(val datum: Int, val left: Tree, val right: Tree);
+
+
+(a)
+def preorder(t: Tree): Unit = {
+    println(t.datum)
+    if (t.left != null)
+        preorder(t.left)
+    if (t.right != null)
+        preorder(t.right)
+}
+
+
+(b)

@@ -324,3 +324,227 @@ def preorder(t: Tree): Unit = {
 
 
 (b)
+
+
+
+..........................................................................................
+
+
+Question 2
+
+(a) heapAt(i) = lchild(i) < N => a(i) >= a(lchild(i)) and
+                rchild(i) < N => a(i) >= a(rchild(i))
+
+By definition, this is equivalent to:
+
+    heapAt(i) = 2 * i + 1 < N => a(i) >= a(2 * i + 1) and
+                2 * i + 2 < N => a(i) >= a(2 * i + 2)
+
+Now, because i >= N / 2, we deduce that 2 * i + 1 >= N and 2 * i + 2 >= N, so:
+
+    heapAt(i) = True => a(i) >= a(2 * i + 1) and
+                True => a(i) >= a(2 * i + 2)
+
+Which is equivalent to:
+
+    heapAt(i) = True and
+                True
+
+Or,
+
+    heapAt(i) = True
+
+As expected.
+
+
+(b) 
+// Auxiliary function, swap the values of nodes i and j
+def swap(i: Int, j: Int) {
+    val aux = a(i)
+    a(i) = a(j)
+    a(j) = aux
+}
+
+// The required function
+def siftDown(n: Int, end: Int) = {
+    // Invariant: 0 <= n <= end <= N   and
+    //            heapAt[n0 .. n)      and
+    //            heapAt[n + 1 .. end) and
+    //            a is a rearrangement of a0
+    while (n < end) {
+        val l = lchild(n); val r = rchild(n)
+        if (l >= end) // If n has no valid children, then stop
+            n = end
+        else if (r >= end) { // If n only got a left child
+            if (a(l) > a(n)) { // See if swapping n with it is necessary
+                swap(n, l) // And either do the swap and continue
+                n = l
+            }
+            else
+                n = end   // Or stop, as the heap property is satisfied
+        }
+        else {
+            if (a(l) > a(r)) { // See which of the two children has the larger value
+                               // and do swaps accordingly, similar to the former case
+                if (a(l) > a(n)) {
+                    swap(n, l)
+                    n = l
+                }
+                else
+                    n = end
+            }
+            else {
+                if (a(r) > a(n)) {
+                    swap(n, r)
+                    n = r
+                }
+                else
+                    n = end
+            }
+        }
+    }
+}
+
+
+The idea is to swap n with its son of larger value whenever !heapAt(n), stopping as soon
+as heapAt(n) evaluates to true.
+
+
+(c)
+def heapify = {
+    // Invariant: -1 <= n < N and
+    //            heapAt[(n + 1) .. N) and
+    //            a is a rearrangement of a0
+    for (n <- (N - 1) to 0 by -1)
+        siftDown(n, N)
+}
+
+
+(d) Consider the function parent(n) = (n + 1) / 2 - 1 such that for all 0 < n < N we have
+lchild(parent(n)) = n or rchild(parent(n)) = n.
+Then, because heapAt holds for all 0 < n < N, we have that a(n) <= a(parent(n)) <=
+a(parent(parent(n))) <= ... <= a(0) and so a(0) is the largest element in a[0 .. end).
+
+
+(e)
+def heapsort = {
+    heapify
+    // Invariant: -1 <= n < N
+    //            a is a rearrangement of a0 and
+    //            a(n .. N) consists of the largest N - n - 1 elements of a0 and 
+    //           heapAt[0 .. n]
+    for (n <- (N - 1) to 0 by -1) {
+        swap(0, n)
+        siftDown(0, n)
+    }
+}
+
+
+..........................................................................................
+
+
+Question 3
+
+(a)
+class Node(val datum: Int, val next: ListNode)
+
+class IntList(headNode: Node) {
+    def this() = this(null) // The list is initially empty
+    ...   
+}
+
+I've chosen not to use a dummy header node, as it mostly complicates things in this case,
+so headNode will be null for an empty list and its datum will correspond to the first
+element of the represented list otherwise.
+I've made the default constructor take the header node as a parameter to help in writing
+other methods later (e.g. tail and cons).
+
+Now, for a suitable abstraction function, define the metafunction L(node: Node) s.t.:
+    L(null) = []
+    L(node) = node.datum : L(node.next)
+
+Then,
+    Abs: list = L(headNode)
+
+(b)
+// Is the list empty?
+def isEmpty = headNode == null
+
+// Return the first element of the list
+def head = headNode.datum
+
+// Returns a list containing all except the first element of the current list
+def tail = new IntList(headNode.next)
+
+// Return a new list containing x followed by the elements of the current list
+def cons(x: Int) = new IntList(new Node(x, headNode))
+
+
+(c)
+
+First, define a helper function (which will also come in handy to solve (d)):
+
+
+def reverse = {
+    // Invariant: ans contains all elements of the list
+    //            between headNode and node, exclusive, in reverse order and
+    //            node is reachable from headNode by following "next" links
+    var node = headNode
+    var ans = new IntList
+    while (node != null) {
+        ans = ans.cons(node.datum)  
+        node = node.next
+    }
+    ans
+}
+
+def map(f: Int => Int): IntList = {
+    // Invariant: ans contains all elements of the list
+    //            between headNode and node, exclusive, in reverse order, with f
+    //            applied to their datum before being inserted to ans and
+    //            node is reachable from headNode by following "next" links
+    var node = headNode
+    var ans = new IntList
+
+    while (node != null) {
+        ans = ans.cons(f(node.datum))
+        node = node.next
+    }
+
+    ans.reverse // The list has been built in reverse order, so reverse it
+}
+
+
+(d)
+def filter(p: Int => Boolean): IntList = {
+    // Invariant: ans contains all elements of the list whose datum satisfies p
+    //            between headNode and node, exclusive, in reverse order and
+    //            node is reachable from headNode by following "next" links
+    var node = headNode
+    var ans = new IntList
+
+    while (node != null) {
+        if (p(node.datum))
+            ans = ans.cons(node.datum)
+        node = node.next
+    }
+
+    ans.reverse // The list has been built in reverse order, so reverse it 
+}
+
+
+..........................................................................................
+
+
+Question 4
+
+(a)
+def longestFrom(i: Int, j: Int): Int = {
+    if (i < N && j < N && a(i) == b(j))
+        1 + longestFrom(i + 1, j + 1)
+    else
+        0
+}
+
+
+(b) 

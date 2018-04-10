@@ -698,5 +698,42 @@ such that the excess left at the end in xs(N - 1) is smaller than bs(N - 1).
 
 Question 2
 
-(a)
+(a) 
+/* State: lst: [Int]
+ * Init:  lst = []  */
+trait ReversableBuffer {
+    // Add x to the end of the buffer
+    // Post: lst = lst0 ++ [x]
+    def append(x: Int)
+    
+    // Add x to the start of the buffer
+    // Post: lst = x : lst0
+    def prepend(x: Int)
+    
+    // Remove and return the i-th element, counting from zero
+    // Post: lst = take i lst0 ++ drop (i + 1) lst0 and return lst0 !! i
+    def get(i: Int): Int
+    
+    // Reverse the contents of the buffer
+    // Post: lst = reverse lst
+    def rev
+}
 
+(b)
+
+
+..........................................................................................
+
+
+Question 3
+
+
+(a)
+// Pre:  a is an array of integers and
+//	 n = a.length
+// Post: a is a rearrangement of a0 and
+//       a(i) < a(i + 1) for all 0 <= i < n - 1
+def sort(a: Array[Int], n: Int)
+
+
+(b)

@@ -812,9 +812,8 @@ def quickSort(a: Array[Int]): Unit = {
     q.enqueue((0, a.size))
     
     // Invariant: a is a permutation of a0 and
-    //            sorting each range a[l .. r) with (l, r) in q
-    //            would render a sorted and
-    //            any two distinct elements in q are disjoint
+    //            sorting each range a[l .. r) with (l, r) in q would render a sorted and
+    //            any two distinct ranges corresponding to elements in q are disjoint
     // Variant:   The sum of r - l over (l, r) in q
     while (!q.isEmpty) {
         // (l, r) = q.dequeue
@@ -840,6 +839,8 @@ def sort(a: Array[Int], n: Int) = {
     quickSort(a)
 }
 
+Note: This is like doing BFS on the recursion tree.
+
 
 ..........................................................................................
 
@@ -847,3 +848,27 @@ def sort(a: Array[Int], n: Int) = {
 Question 4
 
 (a)
+def contain(w: String): Boolean = {
+    var node = this
+    for (c <- w) {
+        if (node == null)
+            return false
+        node = node.children(toIndex(c))
+    }
+    return node != null && node.complete
+}
+
+
+(b)
+def add(w: String): Unit = {
+    var node = this
+    for (c <- w) {
+        if (node.children(toIndex(c)) == null)
+            node.children(toIndex(c)) = new Trie;
+        node = node.children(toIndex(c))
+    }
+    node.complete = true
+}
+
+(c)
+

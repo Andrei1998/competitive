@@ -737,3 +737,52 @@ def sort(a: Array[Int], n: Int)
 
 
 (b)
+
+
+
+
+(c)
+
+
+    // Don't forget to include pre and post you've written
+    def quickSort(a: Array[Int]): Unit = {
+        val q = scala.collection.mutable.Queue[(Int, Int)]()
+        q.enqueue((0, a.size))
+        
+        // Invariant: a is a permutation of a0 and
+        //            sorting each range a[l .. r) with (l, r) in q
+        //            would render a sorted
+        // Variant:   The sum of r - l over (l, r) in q
+        while (!q.isEmpty) {
+            // (l, r) = q.dequeue
+            val aux = q.dequeue
+            val l = aux._1
+            val r = aux._2
+            
+            // If not in base case
+            if (r - l > 1) {
+                val pivot = a(l) // Include commentaries here
+                val split = ternaryPartition(a, l, r, pivot)
+                q.enqueue((l, split._1))
+                q.enqueue((split._2, r))
+            }
+        }
+    }
+    
+    // Pre:  a is an array of integers, n = a.length
+    // Post: a is a rearrangement of a0 and
+    //       a(i) < a(i + 1) for all 0 <= i < n - 1
+    def sort(a: Array[Int], n: Int) = {
+        quickSort(a)
+    }
+	
+
+
+Question 4
+
+
+(a)
+
+
+
+

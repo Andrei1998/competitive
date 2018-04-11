@@ -900,3 +900,90 @@ Question 1
 
 (a)
 
+
+
+..........................................................................................
+
+
+Question 2
+
+(a)
+// Invariant: 0 <= i <= N and
+//            For all 0 <= k < i, rowCount(k)
+//            has been correctly computed,
+//            according to the definition of rowCount
+for (i <- 0 until N) {
+	// Invariant: 0 <= j <= N and
+	//            For all 0 <= k < j, rowCount(i)(k)
+	//            has been correctly computed,
+	//            according to the definition of rowCount
+	for (j <- 0 until N)
+		if (a(i)(j)) {
+			if (j > 0)
+				rowCount(i)(j) = 1 + rowCount(i)(j - 1)
+			else
+				rowCount(i)(j) = 1
+		}
+}
+
+
+(b) In order to see why the given formula may be used to calculate the maximum-area
+all-true rectangle with the top-right corner in cell (i, j), one has to imagine iterating
+over all possible down row bounds of the rectangle (i.e. k - 1 in this case). Now, with
+(i, j, k) fixed, the only variable dimension of the rectangle is its left column bound, x.
+x has to be picked such that a[i .. k)(x .. j] is all-true, implying, by definition, that
+j - rowCount(p)(j) <= x < j, for all i <= p < k.
+In other words:
+
+(max of (j - rowCount(p)(j)) over i <= p < k) <= x < j
+
+Or,
+
+j - (min of rowCount(p)(j) over i <= p < k) <= x < j
+
+
+Now, as we want the maximum area, set x = j - (min of rowCount(p)(j) over i <= p < k) to
+get an area of (k - i) * (j - x) = (k - i) * (min of rowCount(p)(j) over i <= p < k), as
+expected.
+
+
+def maxRectangleAt(i: Int, j: Int): Int = {
+	var minimum = N + 1 // = INF
+	var ans = 0
+	// Invariant: i + 1 <= k <= N + 1 and
+	//            minimum = min(rowCount[i .. (k - 1))(j) and
+	//            ans = max{(p - i) * min{rowCount(m)(j): i <= m < p}: i < p < k}
+	for (k <- i + 1 to N) {
+		if (rowCount(k - 1)(j) < minimum)
+			minimum = rowCount(k - 1)(j)
+		val aux = (k - i) * minimum
+		if (aux > ans)
+			ans = aux
+	}
+	ans
+}
+
+
+(c)
+def maxRectangle = {
+	var ans = 0
+	for (i <- 0 until N)
+		for (j <- 0 until N) {
+			val ansHere = maxRectangleAt(i, j)
+			if (ansHere > ans)
+				ans = ansHere
+		}
+	ans
+}
+
+Note: There is a standard way to do this in O(N^2) time using the same rowCount array
+together with a linear time algorithm for solving the maximum-area rectangle in a
+histogram (the standard one is based on 2 stack-based computations).
+
+
+.........................................................................................
+
+
+Question 3
+
+(a)

@@ -719,6 +719,7 @@ trait ReversableBuffer {
     def rev
 }
 
+
 (b)
 
 
@@ -726,7 +727,6 @@ trait ReversableBuffer {
 
 
 Question 3
-
 
 (a)
 // Pre:  a is an array of integers and
@@ -736,53 +736,114 @@ Question 3
 def sort(a: Array[Int], n: Int)
 
 
-(b)
+(b) Helper function that swaps a(i) and a(j):
+// Pre: 0 <= i, j < a.size
+// Post: a(i) = a0(j) and
+//       a(j) = a0(i) and
+//       a(k) = a0(k) for all 0 <= k < a.size, k != i, j 
+def swap(a: Array[Int], i: Int, j: Int) {
+    val aux = a(i)
+    a(i) = a(j)
+    a(j) = aux
+}
+
+Classical ternary partition subroutine:
+// Pre: 0 <= l < r < a.size and
+//      a(l) = value
+// Post: Returns (x, y) and permutes array a such that:
+//       All elements 0 <= k < a.size with a0(k) = value are now in [x .. y) and
+//       All elements 0 <= k < a.size with a0(k) < value are now in [0 .. x) and
+//       All elements 0 <= k < a.size with a0(k) > value are now in [y .. a.size)
+def ternaryPartition(a: Array[Int], l: Int, r: Int, value: Int): (Int, Int) = {
+    var firstEqual = l
+    var lastUnexplored = r - 1 
+    var i = l + 1
+    // Invariant: a is a permutation of a0 and
+    //            1 <= l + 1 <= i <= lastUnExplored + 1 <= r <= a.size and
+    //            a[l .. firstEqual) < value and
+    //            a[firstEqual .. i) = value and
+    //            a(lastUnexplored .. r) > value
+    while (i <= lastUnexplored) {
+        if (a(i) < value) {
+            swap(a, firstEqual, i)
+            firstEqual = firstEqual + 1
+            i = i + 1
+        }
+        else if (a(i) > value) {
+            swap(a, i, lastUnexplored)
+            lastUnexplored = lastUnexplored - 1
+        }
+        else
+            i = i + 1
+    }
+    (firstEqual, lastUnexplored + 1)
+}
+
+Ternary Quicksort:
+// Pre: 0 <= l < r <= a.size
+// Post: Permutes a[l .. r) into non-decreasing order.
+def quickSort(a: Array[Int], l: Int, r: Int): Unit = {
+    if (r - l > 1) {
+        val pivot = a(l) // Take a(l) to be the pivot
+        val split = ternaryPartition(a, l, r, pivot) // Partition around it
+        quickSort(a, l, split._1) // Sort all values < pivot
+        quickSort(a, split._2, r) // Sort all values > pivot
+    }
+}
+
+Interface function:
+// Pre:  a is an array of integers, n = a.length
+// Post: a is a rearrangement of a0 and
+//       a(i) < a(i + 1) for all 0 <= i < n - 1
+def sort(a: Array[Int], n: Int) = {
+    quickSort(a, 0, n)
+}
+
+Now, for a very formal proof of correctness one would also need to carefully show how the
+invariant is being maintained inside the ternaryPartition function and apply strong
+induction on r - l to show that the quickSort function always correctly sorts a[l .. r).
 
 
-
-
-(c)
-
-
-    // Don't forget to include pre and post you've written
-    def quickSort(a: Array[Int]): Unit = {
-        val q = scala.collection.mutable.Queue[(Int, Int)]()
-        q.enqueue((0, a.size))
+(c) Iterative Ternary Quicksort:
+// Pre: 0 <= l < r <= a.size
+// Post: Permutes a[l .. r) into non-decreasing order.
+def quickSort(a: Array[Int]): Unit = {
+    val q = scala.collection.mutable.Queue[(Int, Int)]()
+    q.enqueue((0, a.size))
+    
+    // Invariant: a is a permutation of a0 and
+    //            sorting each range a[l .. r) with (l, r) in q
+    //            would render a sorted and
+    //            any two distinct elements in q are disjoint
+    // Variant:   The sum of r - l over (l, r) in q
+    while (!q.isEmpty) {
+        // (l, r) = q.dequeue
+        val aux = q.dequeue
+        val l = aux._1
+        val r = aux._2
         
-        // Invariant: a is a permutation of a0 and
-        //            sorting each range a[l .. r) with (l, r) in q
-        //            would render a sorted
-        // Variant:   The sum of r - l over (l, r) in q
-        while (!q.isEmpty) {
-            // (l, r) = q.dequeue
-            val aux = q.dequeue
-            val l = aux._1
-            val r = aux._2
-            
-            // If not in base case
-            if (r - l > 1) {
-                val pivot = a(l) // Include commentaries here
-                val split = ternaryPartition(a, l, r, pivot)
-                q.enqueue((l, split._1))
-                q.enqueue((split._2, r))
-            }
+        // If not in base case
+        if (r - l > 1) {
+            val pivot = a(l) // Take a(l) to be the pivot
+            val split = ternaryPartition(a, l, r, pivot) // Partition around it
+            q.enqueue((l, split._1)) // Sort all values < pivot, later
+            q.enqueue((split._2, r)) // Sort all values > pivot, later
         }
     }
-    
-    // Pre:  a is an array of integers, n = a.length
-    // Post: a is a rearrangement of a0 and
-    //       a(i) < a(i + 1) for all 0 <= i < n - 1
-    def sort(a: Array[Int], n: Int) = {
-        quickSort(a)
-    }
-	
+}
+
+Also, change the calling function appropriately:
+// Pre:  a is an array of integers, n = a.length
+// Post: a is a rearrangement of a0 and
+//       a(i) < a(i + 1) for all 0 <= i < n - 1
+def sort(a: Array[Int], n: Int) = {
+    quickSort(a)
+}
+
+
+..........................................................................................
 
 
 Question 4
 
-
 (a)
-
-
-
-

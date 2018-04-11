@@ -870,5 +870,24 @@ def add(w: String): Unit = {
     node.complete = true
 }
 
+
 (c)
+def allWords(ls: String): List[String] = {
+    if (ls.length == 0) {
+        if (complete)
+            return List[String]("")
+        else
+            return List[String]()
+    }
+    
+    var ans = List[String]()
+    for (i <- 0 until ls.length) {
+        val c = ls.charAt(i)
+        if (children(toIndex(c)) != null) {
+            val subans = children(toIndex(c)).allWords(ls.substring(0, i).concat(ls.substring(i + 1))).map(x => c.toString.concat(x))
+            ans = ans ++ subans
+        }
+    }
+    ans
+}
 

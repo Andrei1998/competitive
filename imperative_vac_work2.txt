@@ -989,7 +989,7 @@ sum is bounded from above by:
 	(r0 - l0) * (1 + 1 / 2 + 1 / 4 + ...) = (N + 1) * 2 = O(N), as expected.
 	
 	
-Note: There is neat way to (c) in linear time, constant additional space and without
+Note: There is neat way to solve (c) in linear time, constant additional space and without
 modifying array a at any point during runtime (a clever use of Floyd's Cycle Finding
 Algorithm).
 

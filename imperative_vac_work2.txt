@@ -358,7 +358,7 @@ As expected.
 
 
 (b) 
-// Auxiliary function, swap the values of nodes i and j
+// Auxiliary function, swaps the values of nodes i and j
 def swap(i: Int, j: Int) {
     val aux = a(i)
     a(i) = a(j)
@@ -750,7 +750,7 @@ def swap(a: Array[Int], i: Int, j: Int) {
 Classical ternary partition subroutine:
 // Pre: 0 <= l < r < a.size and
 //      a(l) = value
-// Post: Returns (x, y) and permutes array a such that:
+// Post: Returns (x, y) and permutes array a[l .. r) such that:
 //       All elements 0 <= k < a.size with a0(k) = value are now in [x .. y) and
 //       All elements 0 <= k < a.size with a0(k) < value are now in [0 .. x) and
 //       All elements 0 <= k < a.size with a0(k) > value are now in [y .. a.size)
@@ -758,7 +758,8 @@ def ternaryPartition(a: Array[Int], l: Int, r: Int, value: Int): (Int, Int) = {
     var firstEqual = l
     var lastUnexplored = r - 1 
     var i = l + 1
-    // Invariant: a is a permutation of a0 and
+    // Invariant: a[l .. r) is a permutation of a0[l .. r) and
+	//			  a(k) = a0(k) for all k not in [l .. r)
     //            1 <= l + 1 <= i <= lastUnExplored + 1 <= r <= a.size and
     //            a[l .. firstEqual) < value and
     //            a[firstEqual .. i) = value and
@@ -899,7 +900,98 @@ def allWords(ls: String): List[String] = {
 Question 1
 
 (a)
+// Helper function, swaps the values of a(i) and a(j)
+def swap(i: Int, j: Int) {
+    val aux = a(i)
+    a(i) = a(j)
+    a(j) = aux
+}
 
+def partition(l: Int, r: Int, p: Int): Int = {
+	// Invariant: a[l .. r) is a permutation of a0[l .. r) and
+	//			  a(k) = a0(k) for all k not in [l .. r) and
+	//            l <= j <= i <= r and
+	//            a[l .. j) < p <= a[j .. i)
+	var j = l
+	for (i <- l until r)
+		if (a(i) < p) {
+			swap(i, j)
+			j = j + 1
+		}
+	j
+}
+
+
+(b) val k = partition(0, N, p)
+
+    (i) If k < p, we know that a[0 .. k) < p, so a contains k < p values in range
+		[0 .. p). Therefore, by the Pigeonhole Principle, there ought to be a missing
+		value x in range [0 .. p), contained in a[0 .. k).
+   (ii) If k >= p, we know that a[0 .. k) < p, so a contains k >= p values in range
+		[0 .. p), meaning that a contains at most N - p values in range [p .. N], which
+		is made up of N - p + 1 integers. Therefore, by the Pigeonhole Principle, there
+		ought to be a missing value x in range [p .. N + 1).
+   
+
+(c)
+def findMissing: Int = {
+	var arrayL = 0; var arrayR = N
+	var l = 0; var r = N + 1
+	// Invariant: a is a permutation of a0 and
+	//            one of the missing values x in a is in [l .. r) and
+	//            l <= a[arrayL .. arrayR) <= r and
+	//            for all 0 <= k < N not in [arrayL .. arrayR), a(k) not in [l .. r] and  
+	// 			  arrayR - arrayL < r - l
+	while (arrayL < arrayR) {
+		val mid = (l + r) / 2
+		val k = partition(arrayL, arrayR, mid)
+		if (k - arrayL < mid - l) {
+			arrayR = k
+			r = mid
+		}
+		else {
+			arrayL = k
+			l = mid
+		}
+	}
+	l
+}
+
+
+This simply generalizes the idea stated in part (b):
+Maintain two ranges [arrayL .. arrayR) and [l .. r) such that all occurrences of
+values [l .. r) in a are in a[arrayL .. arrayR). Given that arrayR - arrayL < r - l,
+the Pigeonhole Principle tells that there must be an x in [l .. r) that does not occur
+in a[arrayL .. arrayR). It holds true that whichever of [l .. mid) and [mid .. r) accounts
+for less values in a[arrayL .. arrayR) than its length has to be the right subinterval to
+continue our search into (again, by the Pigeonhole Principle).
+
+
+The runtime is dominated by the partition function calls, which run in total time
+
+   arrayR0 - arrayL0 +
+   arrayR1 - arrayR1 +
+   ...
+ 
+Where (arrayLi, arrayRi) are the successive values (arrayL, arrayR) takes.
+The invariant tells us that, at all times, arrayR - arrayL < r - l, so our sum is bounded
+from above by
+
+	r0 - l0 +
+	r1 - l1 +
+	...
+	
+Where, similarly, (li, ri) are the successive values (l, r) takes.
+Now, knowing that r - l is about halved (to be rigorous, round N up to the nearest power
+of 2 minus 1) with every iteration of the binary search loop, we may conclude that our
+sum is bounded from above by:
+
+	(r0 - l0) * (1 + 1 / 2 + 1 / 4 + ...) = (N + 1) * 2 = O(N), as expected.
+	
+	
+Note: There is neat way to (c) in linear time, constant additional space and without
+modifying array a at any point during runtime (a clever use of Floyd's Cycle Finding
+Algorithm).
 
 
 ..........................................................................................
@@ -946,7 +1038,6 @@ Now, as we want the maximum area, set x = j - (min of rowCount(p)(j) over i <= p
 get an area of (k - i) * (j - x) = (k - i) * (min of rowCount(p)(j) over i <= p < k), as
 expected.
 
-
 def maxRectangleAt(i: Int, j: Int): Int = {
 	var minimum = N + 1 // = INF
 	var ans = 0
@@ -978,7 +1069,7 @@ def maxRectangle = {
 
 Note: There is a standard way to do this in O(N^2) time using the same rowCount array
 together with a linear time algorithm for solving the maximum-area rectangle in a
-histogram (the standard one is based on 2 stack-based computations).
+histogram (the standard one consists of two stack-based computations).
 
 
 .........................................................................................

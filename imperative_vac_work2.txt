@@ -359,8 +359,46 @@ class Stack {
 
 
 (c)
+def preorder(t: Tree): Unit = {
+	val stk = new Stack; // A stack of trees
+	var node = t
+	// Invariant: We still need to print the preorder traversal of node;
+	//            and for each tree t' in the stack, we still need to print
+	//            the preorder traversal of t'.right (processing the trees in
+	//			  the stack in reverse order of that in which they've been added
+	//			  into the stack).
+	// Variant: Define the "size" of a tree as 1 + the sum of the sizes of
+	//          its children. Now, v = node.size + sum {t'.right.size: t' in stk}.
+	while (!stk.isEmpty || node != null) {
+		if (node != null) {
+			println(node.datum)
+			stk.push(node)
+			node = node.left
+		}
+		else
+			node = stk.pop.right
+	}
+}
 
 
+The main idea is to maintain two variables, a tree "node" and a stack "stk" and
+assume that everything that we've got left to print is the preorder traversal of node,
+followed by the preorder traversals of the nodes in stk. Now, the main loop has two cases:
+
+	1. If node != null, then, first of all, we need to print node's preorder traversal.
+	   We begin doing this by first printing node's datum field, followed by pushing node
+	   into the stack (to signal that we still need to print the preorder traversal of
+	   its right child before moving on to any other nodes in the stack) and setting
+	   node = node.left, to start the process of printing node's left subtree.
+	2. If node == null, then we need to acquire a new node and start printing its preorder
+	   traversal. The only valid candidate is certainly stk.top.right, based on the order
+	   in which we pushed the nodes into the stack.
+
+The code terminates because the stated variant v starts at v = t.size and decreases by
+exactly one with each iteration of the main loop. By the well ordering of the natural
+numbers, this can only mean that v will eventually reach 0 (in which case stk.isEmpty and
+node == null certainly both hold true, so the program will exit the while loop).
+	   
 ..........................................................................................
 
 

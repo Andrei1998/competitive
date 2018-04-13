@@ -1079,3 +1079,78 @@ histogram (the standard one consists of two stack-based computations).
 Question 3
 
 (a)
+
+
+.........................................................................................
+
+
+Question 4
+
+(a)
+for (i <- 0 until N)
+    rows(i) = List()
+
+    
+(b)
+// DTI: rows.size = N and
+//      for all 0 <= i < N:
+//          rows(i).filter(p => p._1) is ordered in strictly
+//              increasing order, with all elements in [0 .. N)
+//          rows(i).filter(p => p._2) has no zero entries
+
+
+(c)
+def get(i: Int, j: Int): Double = {
+    val aux = rows(i).filter(p => p._1 == j)
+    if (aux == List())
+        0.0
+    else
+        aux.head._2
+}
+
+
+(d)
+def set(i: Int, j: Int, x: Double): Unit = {
+    if (x != 0)
+        rows(i) = rows(i).takeWhile(p => p._1 < j) ++ List((j, x)) ++ rows(i).dropWhile(p => p._1 <= j)
+    else // Edge case
+        rows(i) = rows(i).takeWhile(p => p._1 < j) ++ rows(i).dropWhile(p => p._1 <= j)
+}
+
+
+(e)
+def scale(s: Double): SparseMatrix = {
+    val ans = new SparseMatrix(N)
+    if (s == 0) // Edge case, if we are nullifying the matrix
+        return ans
+    for (i <- 0 until N)
+        for (p <- rows(i))
+            ans.set(i, p._1, p._2 * s)
+    ans
+}
+
+
+(e)
+def transpose: SparseMatrix = {
+    val ans = new SparseMatrix(N)
+    for (i <- 0 until N)
+        for (p <- rows(i))
+            ans.set(p._1, i, p._2)
+    ans
+}
+
+
+(f)
+def mult(that: SparseMatrix): SparseMatrix = {
+    require(N == that.N) // Check for compatibility
+    val ans = new SparseMatrix(N)
+    for (i <- 0 until N)
+        for (j <- 0 until N) {
+            // Dot product row i with column j
+            var sum: Double = 0.0
+            for (k <- 0 until N)
+                sum = sum + get(i, k) * that.get(k, j)
+            ans.set(i, j, sum)
+        }
+    ans
+}

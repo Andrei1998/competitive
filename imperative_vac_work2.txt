@@ -310,9 +310,6 @@ def rotate(i: Int, n: Int, k: Int): Unit = {
 
 Question 1
 
-class Tree(val datum: Int, val left: Tree, val right: Tree);
-
-
 (a)
 def preorder(t: Tree): Unit = {
     println(t.datum)
@@ -324,7 +321,44 @@ def preorder(t: Tree): Unit = {
 
 
 (b)
+class Stack {
+	private val MAX = 1000 // The maximum size of the stack
+	private val stk = new Array[Tree](MAX)
+	private var stkSz = 0
+	
+	// DTI: 0 <= stkSz <= MAX
+	// Abs: treeSeq = stk[0 .. stkSz)
+	
+	// Add t to the start (i.e. top) of the stack
+	// POST: stk[stkSz - 1] = t and
+	//       stk[0 .. stkSz - 1) = stk0[0 .. stkSz - 1) and 
+	//       stkSz = stkSz0 + 1 
+	def push(t: Tree): Unit = {
+		require(stkSz < MAX)
+		stk(stkSz) = t
+		stkSz = stkSz + 1
+	}
+	
+	// Remove and return the first (i.e. top) element of the stack
+	// PRE:  stkSz > 0
+	// POST: stkSz = stkSz0 - 1 and
+	//       stk[0 .. stkSz) = stk0[0 .. stkSz) and
+	//       returns stk0[stkSz0 - 1]
+	def pop: Tree = {
+		require(stkSz > 0)
+		stkSz = stkSz - 1
+		stk(stkSz)
+	}
+	
+	// Test whether the stack is empty
+	// POST: stk = stk0 and
+	//       stkSz = stkSz0 and
+	//       returns stkSz == 0
+	def isEmpty: Boolean = (stkSz == 0)
+}
 
+
+(c)
 
 
 ..........................................................................................

@@ -366,7 +366,8 @@ def swap(i: Int, j: Int) {
 }
 
 // The required function
-def siftDown(n: Int, end: Int) = {
+def siftDown(_n: Int, end: Int) = {
+    var n = _n
     // Invariant: 0 <= n <= end <= N   and
     //            heapAt[n0 .. n)      and
     //            heapAt[n + 1 .. end) and

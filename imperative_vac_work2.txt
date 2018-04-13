@@ -721,7 +721,133 @@ trait ReversableBuffer {
 }
 
 
-(b)
+(b) Note (written afterwards): In retrospect (ii) would have worked out much neater had I
+used two dummy sentinel nodes for head and tail.
+
+
+(i) For implementing LLBuffer internally I will use a doubly linked list. A list node will
+look like this:
+
+class Node(val datum: Int, var prev: Node, var next: Node)   
+                
+I will also define the following 4 state variables:
+		
+var head: Node = null // The beginning and 
+var tail: Node = null // the end of the Linked List 
+var reversed: Boolean = false // Accounts for the reverse operations (we're basically
+							  // going to use mirrored versions of all operations
+							  // whenever the LLBuffer is in its reversed state)
+var length: Int = 0 // Keeps track of the size of the list
+
+I've chosen this design so that I can give reasonably simple constant time implementations
+for all operations but get (which would need a different data structure for time better
+than linear in the worst case).
+
+The abstraction function, in terms of the usual L(node) metafunction:
+	L(null) = []
+	L(node) = node.datum : L(node.next)
+	
+// Abs: lst = if not reversed then L(begin) else reverse L(begin)
+
+For the DTI, also define a B(node) metafunction:
+	B(null) = []
+	B(node = node.datum: B(node.prev)
+
+// DTI: L(head) finite and
+//		B(tail) finite and
+//		length   = length lst and
+// 		reversed = the paritiy of the total number of rev function calls and
+//		L(head) = reverse B(tail)
+
+
+(ii)
+def rev = {
+	if (reversed)
+		reversed = false
+	else
+		reversed = true
+}
+
+def prepend(x: Int) = {
+	length = 1 + length
+	// Edge case - empty list
+	if (length == 1) {
+		head = new Node(x, null, null)
+		tail = head
+	}
+	else if (!reversed) {
+		head = new Node(x, null, head)
+		head.next.prev = head
+	}
+	else {
+		tail = new Node(x, tail, null)
+		tail.prev.next = tail
+	}
+}
+
+def append(x: Int) = {
+	length = 1 + length
+	// Edge case - empty list
+	if (length == 1) {
+		head = new Node(x, null, null)
+		tail = head
+	}
+	else if (reversed) {
+		head = new Node(x, null, head)
+		head.next.prev = head
+	}
+	else {
+		tail = new Node(x, tail, null)
+		tail.prev.next = tail
+	}
+}
+
+// Ignores the "reversed" variable
+// Assumes i is valid and not 0 or length - 1
+def get(node: Node, i: Int): Int = {
+	if (i == 1) { // Erase node.next
+		val aux = node.next.datum
+		length = length - 1
+		node.next = node.next.next
+		node.next.prev = node.next.prev.prev
+		aux
+	}
+	else
+		get(node.next, i - 1)
+}
+
+def get(_i: Int): Int = {
+	var i = _i
+	if (reversed)
+		i = length - i - 1
+	require(0 <= i && i < length)
+	
+	// Edge case - length = 1
+	if (length == 1) {
+		val aux = head.datum
+		length = length - 1
+		head = null
+		tail = null
+		return aux
+	}
+	// Edge case - remove head
+	if (i == 0) {
+		val aux = head.datum
+		length = length - 1
+		head = head.next
+		head.prev = null
+		return aux
+	}
+	// Edge case - remove tail
+	if (i == length - 1) { 
+		val aux = tail.datum
+		length = length - 1
+		tail = tail.prev
+		tail.next = null
+		return aux
+	}
+	get(head, i)
+}
 
 
 ..........................................................................................
@@ -1191,7 +1317,8 @@ def get(i: Int, j: Int): Double = {
 (d)
 def set(i: Int, j: Int, x: Double): Unit = {
     if (x != 0)
-        rows(i) = rows(i).takeWhile(p => p._1 < j) ++ List((j, x)) ++ rows(i).dropWhile(p => p._1 <= j)
+        rows(i) = rows(i).takeWhile(p => p._1 < j) ++ List((j, x)) ++
+                  rows(i).dropWhile(p => p._1 <= j)
     else // Edge case
         rows(i) = rows(i).takeWhile(p => p._1 < j) ++ rows(i).dropWhile(p => p._1 <= j)
 }

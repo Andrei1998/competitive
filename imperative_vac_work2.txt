@@ -1079,6 +1079,85 @@ histogram (the standard one consists of two stack-based computations).
 Question 3
 
 (a)
+val head = new Node(Int.MinValue)
+val tail = new Node(Int.MaxValue)
+for (i <- 0 until NumLevels) {
+	head.nexts(i) = tail
+	tail.nexts(i) = null // Although hopefully this
+						 // should never get used
+}
+
+
+(b)
+def getList(node: Node, level: Int): List[Node] = {
+	if (node == tail)
+		List(node)
+	else
+		List(node) ++ getList(node.nexts(level), level)
+}
+
+// Abs: lst = getList(head, 0).map(n => n.datum)
+//      (I considered the state to be a Scala List instead of a Haskell List)
+// DTI: For all 0 <= i < NumLevels
+//          getList(head, i).map(n => n.datum) is sorted is non-decreasing order and
+//          getList(head, i) is finite and it ends with tail
+//          tail.nexts(i) = null
+//      For all 0 <= i < NumLevels - 1
+//          if n in getList(head, i), n.nexts(i) = null => n.nexts(i + 1) = null and
+//          getList(head, i + 1) is a subsequence of getList(head, i)
+//      head.datum = Int.MinValue
+//      tail.datum = Int.MaxValue
+//      No nodes other than head and tail have their datum field set to
+//          Int.MinValue or Int.MaxValue
+//      For all nodes other than tail, nexts(0) != null
+
+
+(c)
+def findPreds(x: Int): Array[Node] = {
+	var currentLevel = NumLevels - 1
+	var node = head
+	val ans = new Array[Node](NumLevels)
+	while (currentLevel >= 0) {
+		if (node.nexts(currentLevel).datum < x)
+			node = node.nexts(currentLevel)
+		else {
+			ans(currentLevel) = node
+			currentLevel = currentLevel - 1
+		}
+	}
+	ans
+}
+
+(d)
+def contains(x: Int): Boolean = {
+	val aux = findPreds(x)
+	val nd = aux(0).nexts(0)
+	nd.datum == x
+}
+
+
+(e)
+def add(x: Int) = {
+	val aux = findPreds(x)
+	val cnt = pickLevel
+	val node = new Node(x)
+	for (i <- 0 to cnt) {
+		node.nexts(i) = aux(i).nexts(i)
+		aux(i).nexts(i) = node
+	}
+}
+
+
+(f)
+def delete(x: Int) = {
+	if (contains(x)) {
+		val aux = findPreds(x)
+		val node = aux(0).nexts(0)
+		for (i <- 0 until NumLevels)
+			if (node.nexts(i) != null)
+				aux(i).nexts(i) = node.nexts(i)
+	}   
+}
 
 
 .........................................................................................

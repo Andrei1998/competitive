@@ -51,17 +51,17 @@ To improve the design:
 Question 4
 
 r1.accept(a) // "Accepted for rendering.", because the only accept function
-			 // that is a member of the Renderer class is being called
-			 // on an OpaqueTriangle (which extends Triangle, so there should be
-			 // no issue in doing that).
+             // that is a member of the Renderer class is being called
+             // on an OpaqueTriangle (which extends Triangle, so there should be
+             // no issue in doing that).
 r2.accept(a) // "Accepted for ray-trace rendering.", because of the two
-		     // members of RayTracingRenderer, the most particular one is being
-			 // called (which is a direct member of RayTracingRenderer).
+             // members of RayTracingRenderer, the most particular one is being
+             // called (which is a direct member of RayTracingRenderer).
 
 To get the output of r1.accept(a) to change modify RayTracingRenderer accordingly:
 
 class RayTracingRenderer extends Renderer {
-	override def accept(a: Triangle) = println("Accepted for ray-trace rendering.")
+    override def accept(a: Triangle) = println("Accepted for ray-trace rendering.")
 }
 
 This will make r1.accept(a) to output "Accepted for ray-trace rendering.", due
@@ -74,42 +74,42 @@ to Scala using dynammic binding by default.
 Question 5
 
 class Ellipse(private var _a: Int, private var _b: Int) {
-	def a = _a
-	def a_=(a: Int) = {_a = a}
-	def b = _b
-	def b_=(b: Int) = {_b = b}
-	
-	// No need to override in LoggedEllipse
-	def exch1 = {
-		val aux = a
-		a = b
-		b = aux
-	}
+    def a = _a
+    def a_=(a: Int) = {_a = a}
+    def b = _b
+    def b_=(b: Int) = {_b = b}
+    
+    // No need to override in LoggedEllipse
+    def exch1 = {
+        val aux = a
+        a = b
+        b = aux
+    }
 
-	// Override needed - illustrates the "Fragile Base Class" problem
-	def exch2 = {
-		val aux = _a
-		_a = _b
-		_b = aux
-	}
+    // Override needed - illustrates the "Fragile Base Class" problem
+    def exch2 = {
+        val aux = _a
+        _a = _b
+        _b = aux
+    }
 }
 
 class LoggedEllipse(private var _a: Int, private var _b: Int)
-	extends Ellipse(_a, _b) {
-	private var increases = 0
+    extends Ellipse(_a, _b) {
+    private var increases = 0
 
-	def getIncreases = increases
-	
-	override def a_=(a: Int) = {
-		if (a > _a)
-			increases = increases + 1
-		_a = a
-	}
-	override def b_=(b: Int) = {
-		if (b > _b)
-			increases = increases + 1
-		_b = b
-	} 
+    def getIncreases = increases
+    
+    override def a_=(a: Int) = {
+        if (a > _a)
+            increases = increases + 1
+        _a = a
+    }
+    override def b_=(b: Int) = {
+        if (b > _b)
+            increases = increases + 1
+        _b = b
+    } 
 }
 
 
@@ -120,7 +120,7 @@ Question 6
 
 (a) This is called "composition" and is the industry goto for avoiding inheritance:
 class PlaneText {
-	private val text: Text = new Text
+    private val text: Text = new Text
     ...
 }
 
@@ -136,8 +136,8 @@ class PlaneText extends Transmittable { ... }
        out more methods (as they've lost the ability to be implicitly inherited).
     4. Also, every function call has to be forwarded to a different class, adding
        to the overhead.
-	   
-	   
+       
+       
 -----------------------------------------------------------------------------------------
 
 
@@ -150,16 +150,16 @@ coll contains r2 // false != true
 
 // A proper Rectangle class:
 class Rectangle(val width: Int, val height: Int) {
-	// Proper overriding of equals, defines an equivalence relation
-	override def equals(other: Any): Boolean = other match {
-		case that: Rectangle => that.canEqual(this) &&
-								this.width == that.width && this.height == that.height
-		case _ => false
-	}
+    // Proper overriding of equals, defines an equivalence relation
+    override def equals(other: Any): Boolean = other match {
+        case that: Rectangle => that.canEqual(this) &&
+                                this.width == that.width && this.height == that.height
+        case _ => false
+    }
 
-	override def hashCode = 41 * width + height // For use with HashSet etc.
+    override def hashCode = 41 * width + height // For use with HashSet etc.
 
-	def canEqual(other: Any) = other.isInstanceOf[Rectangle] // For derived classes
-															 // that don't override
-															 // equals
+    def canEqual(other: Any) = other.isInstanceOf[Rectangle] // For derived classes
+                                                             // that don't override
+                                                             // equals
 } 

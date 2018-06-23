@@ -69,11 +69,11 @@ object Main extends App {
         n // I and either n = N or s[0 .. N - n) == s[n, N) (in which case n is the smallest period, as required)
     }
     
-	println(minPeriod("abcabc".toArray)) // 3
+    println(minPeriod("abcabc".toArray)) // 3
     println(minPeriod("abcac".toArray))  // 5
 
-	
-	----------------------------------------------------------------------------------------------------
+    
+    ----------------------------------------------------------------------------------------------------
 
 
     // Question 7
@@ -97,7 +97,7 @@ object Main extends App {
      * The smallest m satisfying this is ceil(q / p)
      * Or, in Scala m = (q + p - 1) / p
      */
-	 
+     
     // (b)
     def egyptian(p: Int, q: Int): Array[Int] = {
         var a = p; var b = q
@@ -111,11 +111,11 @@ object Main extends App {
         }
         d // I and a = 0 => p / q = 1 / d[0] + ... + 1 / d[index - 1], as required
     }
-	
+    
     println(egyptian(3, 5).deep.mkString(" ")) // 2 10
     println(egyptian(5, 6).deep.mkString(" ")) // 2 3
     
-	/* (c)
+    /* (c)
      * Let's show that the old p (a > 0) is strictly smaller that the new p (a * m - b):
      * a * m - b = a * ceil(b / a) - b <= a * (floor(b / a) + 1) - b = a - (b - a * floor(b / a))
      *                                                               = a - b % a <= a
@@ -125,11 +125,11 @@ object Main extends App {
      * in all cases but b % a = 0). But, in this case a * m - b = a <=> a * (b / a) - b = a <=> b - b = a <=> a = 0,
      * which is not of interest.
      */
-		
-	
-	----------------------------------------------------------------------------------------------------
+        
+    
+    ----------------------------------------------------------------------------------------------------
 
-	
+    
     // Question 9
     def log3(n: Int): Int = {
         require(n > 0)
@@ -141,14 +141,14 @@ object Main extends App {
         ans // I and x < 3, so [log3(n)] = ans + [log3(x)] = ans
     }
     
-	println(log3(1)) // 0
+    println(log3(1)) // 0
     println(log3(2)) // 0
     println(log3(3)) // 1
     println(log3(8)) // 1
     println(log3(9)) // 2
-	
-	
-	----------------------------------------------------------------------------------------------------
+    
+    
+    ----------------------------------------------------------------------------------------------------
 
 
     // Question 10
@@ -163,5 +163,5 @@ object Main extends App {
         ans // I and i = -1, so ans = a[0] + a[1] * x + a[2] * x^2 + ... + a[N - 1] * x^(N - 1), as required
     }
     
-	println(eval(Array(1.0, 1.0), 3.0)) // 4.0
+    println(eval(Array(1.0, 1.0), 3.0)) // 4.0
 }

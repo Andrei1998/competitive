@@ -125,7 +125,7 @@ cases need to be discussed separately on a one-by-one basis.
 (c) 
 object Main extends App {
     // Pre: y > 0
-    // Post: returns x such that x * x <= y <= (x + 1) * (x + 1)
+    // Post: returns x such that x * x <= y < (x + 1) * (x + 1)
     def ternarySqrt(y: Int): Int = {
         require(y > 0)
         var l = 1; var r = y + 1 // Invariant I: 0 <= l < r <= y + 1 and l * l <= y < r * r

@@ -11,13 +11,13 @@ def smallestInCommon(a: Array[Int], N: Int, b: Array[Int], M: Int): Int = {
     //            a[0 .. i) together with b[0 .. j) are the smallest    
     //                      i + j elements in a and b considered together and 
     //            there is no element common to a[0 .. i) and b[0 .. j).
-	while (i < N && j < M && a(i) != b(j)) {
-	    if (a(i) < b(j))
-	    	i = i + 1
-	    else
-		    j = j + 1
-	}
-	a(i) // We know that an answer surely exists, so this is well behaved
+    while (i < N && j < M && a(i) != b(j)) {
+        if (a(i) < b(j))
+            i = i + 1
+        else
+            j = j + 1
+    }
+    a(i) // We know that an answer surely exists, so this is well behaved
 }
 
 The program may never access elements of the arrays outside safe bounds
@@ -59,11 +59,11 @@ def smallestInCommon(a: Array[Int], N: Int, b: Array[Int], M: Int,
     //                      i + j + k elements in a, b and c considered together and 
     //            there is no element common to all a[0 .. i), b[0 .. j) and c[0 .. k).
     while (i < N && j < M && k < L && !(a(i) == b(j) && a(i) == c(k))) {
-    	if (a(i) <= b(j) && a(i) <= c(k))
-    	    i = i + 1
-    	else if (b(j) <= a(i) && b(j) <= c(k))
-    	    j = j + 1
-    	else
+        if (a(i) <= b(j) && a(i) <= c(k))
+            i = i + 1
+        else if (b(j) <= a(i) && b(j) <= c(k))
+            j = j + 1
+        else
             k = k + 1
     }
     a(i) // We know that an answer surely exists, so this is well behaved
@@ -317,62 +317,62 @@ def preorder(t: Tree): Unit = {
 
 (b)
 class Stack {
-	private val MAX = 1000 // The maximum size of the stack
-	private val stk = new Array[Tree](MAX)
-	private var stkSz = 0
-	
-	// DTI: 0 <= stkSz <= MAX
-	// Abs: treeSeq = stk[0 .. stkSz)
-	
-	// Add t to the start (i.e. top) of the stack
-	// POST: stk[stkSz - 1] = t and
-	//       stk[0 .. stkSz - 1) = stk0[0 .. stkSz - 1) and 
-	//       stkSz = stkSz0 + 1 
-	def push(t: Tree): Unit = {
-		require(stkSz < MAX)
-		stk(stkSz) = t
-		stkSz = stkSz + 1
-	}
-	
-	// Remove and return the first (i.e. top) element of the stack
-	// PRE:  stkSz > 0
-	// POST: stkSz = stkSz0 - 1 and
-	//       stk[0 .. stkSz) = stk0[0 .. stkSz) and
-	//       returns stk0[stkSz0 - 1]
-	def pop: Tree = {
-		require(stkSz > 0)
-		stkSz = stkSz - 1
-		stk(stkSz)
-	}
-	
-	// Test whether the stack is empty
-	// POST: stk = stk0 and
-	//       stkSz = stkSz0 and
-	//       returns stkSz == 0
-	def isEmpty: Boolean = (stkSz == 0)
+    private val MAX = 1000 // The maximum size of the stack
+    private val stk = new Array[Tree](MAX)
+    private var stkSz = 0
+    
+    // DTI: 0 <= stkSz <= MAX
+    // Abs: treeSeq = stk[0 .. stkSz)
+    
+    // Add t to the start (i.e. top) of the stack
+    // POST: stk[stkSz - 1] = t and
+    //       stk[0 .. stkSz - 1) = stk0[0 .. stkSz - 1) and 
+    //       stkSz = stkSz0 + 1 
+    def push(t: Tree): Unit = {
+        require(stkSz < MAX)
+        stk(stkSz) = t
+        stkSz = stkSz + 1
+    }
+    
+    // Remove and return the first (i.e. top) element of the stack
+    // PRE:  stkSz > 0
+    // POST: stkSz = stkSz0 - 1 and
+    //       stk[0 .. stkSz) = stk0[0 .. stkSz) and
+    //       returns stk0[stkSz0 - 1]
+    def pop: Tree = {
+        require(stkSz > 0)
+        stkSz = stkSz - 1
+        stk(stkSz)
+    }
+    
+    // Test whether the stack is empty
+    // POST: stk = stk0 and
+    //       stkSz = stkSz0 and
+    //       returns stkSz == 0
+    def isEmpty: Boolean = (stkSz == 0)
 }
 
 
 (c)
 def preorder(t: Tree): Unit = {
-	val stk = new Stack; // A stack of trees
-	var node = t
-	// Invariant: We still need to print the preorder traversal of node;
-	//            and for each tree t' in the stack, we still need to print
-	//            the preorder traversal of t'.right (processing the trees in
-	//			  the stack in reverse order of that in which they've been added
-	//			  into the stack).
-	// Variant: Define the "size" of a tree as 1 + the sum of the sizes of
-	//          its children. Now, v = node.size + sum {t'.right.size: t' in stk}.
-	while (!stk.isEmpty || node != null) {
-		if (node != null) {
-			println(node.datum)
-			stk.push(node)
-			node = node.left
-		}
-		else
-			node = stk.pop.right
-	}
+    val stk = new Stack; // A stack of trees
+    var node = t
+    // Invariant: We still need to print the preorder traversal of node;
+    //            and for each tree t' in the stack, we still need to print
+    //            the preorder traversal of t'.right (processing the trees in
+    //            the stack in reverse order of that in which they've been added
+    //            into the stack).
+    // Variant: Define the "size" of a tree as 1 + the sum of the sizes of
+    //          its children. Now, v = node.size + sum {t'.right.size: t' in stk}.
+    while (!stk.isEmpty || node != null) {
+        if (node != null) {
+            println(node.datum)
+            stk.push(node)
+            node = node.left
+        }
+        else
+            node = stk.pop.right
+    }
 }
 
 
@@ -380,20 +380,20 @@ The main idea is to maintain two variables, a tree "node" and a stack "stk" and
 assume that everything that we've got left to print is the preorder traversal of node,
 followed by the preorder traversals of the nodes in stk. Now, the main loop has two cases:
 
-	1. If node != null, then, first of all, we need to print node's preorder traversal.
-	   We begin doing this by first printing node's datum field, followed by pushing node
-	   into the stack (to signal that we still need to print the preorder traversal of
-	   its right child before moving on to any other nodes in the stack) and setting
-	   node = node.left, to start the process of printing node's left subtree.
-	2. If node == null, then we need to acquire a new node and start printing its preorder
-	   traversal. The only valid candidate is certainly stk.top.right, based on the order
-	   in which we pushed the nodes into the stack.
+    1. If node != null, then, first of all, we need to print node's preorder traversal.
+       We begin doing this by first printing node's datum field, followed by pushing node
+       into the stack (to signal that we still need to print the preorder traversal of
+       its right child before moving on to any other nodes in the stack) and setting
+       node = node.left, to start the process of printing node's left subtree.
+    2. If node == null, then we need to acquire a new node and start printing its preorder
+       traversal. The only valid candidate is certainly stk.top.right, based on the order
+       in which we pushed the nodes into the stack.
 
 The code terminates because the stated variant v starts at v = t.size and decreases by
 exactly one with each iteration of the main loop. By the well ordering of the natural
 numbers, this can only mean that v will eventually reach 0 (in which case stk.isEmpty and
 node == null certainly both hold true, so the program will exit the while loop).
-	   
+       
 ..........................................................................................
 
 
@@ -798,12 +798,12 @@ look like this:
 class Node(val datum: Int, var prev: Node, var next: Node)   
                 
 I will also define the following 4 state variables:
-		
+        
 var head: Node = null // The beginning and 
 var tail: Node = null // the end of the Linked List 
 var reversed: Boolean = false // Accounts for the reverse operations (we're basically
-							  // going to use mirrored versions of all operations
-							  // whenever the LLBuffer is in its reversed state)
+                              // going to use mirrored versions of all operations
+                              // whenever the LLBuffer is in its reversed state)
 var length: Int = 0 // Keeps track of the size of the list
 
 I've chosen this design so that I can give reasonably simple constant time implementations
@@ -811,109 +811,109 @@ for all operations but get (which would need a different data structure for time
 than linear in the worst case).
 
 The abstraction function, in terms of the usual L(node) metafunction:
-	L(null) = []
-	L(node) = node.datum : L(node.next)
-	
+    L(null) = []
+    L(node) = node.datum : L(node.next)
+    
 // Abs: lst = if not reversed then L(begin) else reverse L(begin)
 
 For the DTI, also define a B(node) metafunction:
-	B(null) = []
-	B(node = node.datum: B(node.prev)
+    B(null) = []
+    B(node = node.datum: B(node.prev)
 
 // DTI: L(head) finite and
-//		B(tail) finite and
-//		length   = length lst and
-// 		reversed = the paritiy of the total number of rev function calls and
-//		L(head) = reverse B(tail)
+//      B(tail) finite and
+//      length   = length lst and
+//      reversed = the paritiy of the total number of rev function calls and
+//      L(head) = reverse B(tail)
 
 
 (ii)
 def rev = {
-	if (reversed)
-		reversed = false
-	else
-		reversed = true
+    if (reversed)
+        reversed = false
+    else
+        reversed = true
 }
 
 def prepend(x: Int) = {
-	length = 1 + length
-	// Edge case - empty list
-	if (length == 1) {
-		head = new Node(x, null, null)
-		tail = head
-	}
-	else if (!reversed) {
-		head = new Node(x, null, head)
-		head.next.prev = head
-	}
-	else {
-		tail = new Node(x, tail, null)
-		tail.prev.next = tail
-	}
+    length = 1 + length
+    // Edge case - empty list
+    if (length == 1) {
+        head = new Node(x, null, null)
+        tail = head
+    }
+    else if (!reversed) {
+        head = new Node(x, null, head)
+        head.next.prev = head
+    }
+    else {
+        tail = new Node(x, tail, null)
+        tail.prev.next = tail
+    }
 }
 
 def append(x: Int) = {
-	length = 1 + length
-	// Edge case - empty list
-	if (length == 1) {
-		head = new Node(x, null, null)
-		tail = head
-	}
-	else if (reversed) {
-		head = new Node(x, null, head)
-		head.next.prev = head
-	}
-	else {
-		tail = new Node(x, tail, null)
-		tail.prev.next = tail
-	}
+    length = 1 + length
+    // Edge case - empty list
+    if (length == 1) {
+        head = new Node(x, null, null)
+        tail = head
+    }
+    else if (reversed) {
+        head = new Node(x, null, head)
+        head.next.prev = head
+    }
+    else {
+        tail = new Node(x, tail, null)
+        tail.prev.next = tail
+    }
 }
 
 // Ignores the "reversed" variable
 // Assumes i is valid and not 0 or length - 1
 def get(node: Node, i: Int): Int = {
-	if (i == 1) { // Erase node.next
-		val aux = node.next.datum
-		length = length - 1
-		node.next = node.next.next
-		node.next.prev = node.next.prev.prev
-		aux
-	}
-	else
-		get(node.next, i - 1)
+    if (i == 1) { // Erase node.next
+        val aux = node.next.datum
+        length = length - 1
+        node.next = node.next.next
+        node.next.prev = node.next.prev.prev
+        aux
+    }
+    else
+        get(node.next, i - 1)
 }
 
 def get(_i: Int): Int = {
-	var i = _i
-	if (reversed)
-		i = length - i - 1
-	require(0 <= i && i < length)
-	
-	// Edge case - length = 1
-	if (length == 1) {
-		val aux = head.datum
-		length = length - 1
-		head = null
-		tail = null
-		return aux
-	}
-	// Edge case - remove head
-	if (i == 0) {
-		val aux = head.datum
-		length = length - 1
-		head = head.next
-		head.prev = null
-		return aux
-	}
-	// Edge case - remove tail
-	if (i == length - 1) { 
-		val aux = tail.datum
-		length = length - 1
-		tail = tail.prev
-		tail.next = null
-		return aux
-	}
-	get(head, i)
+    var i = _i
+    if (reversed)
+        i = length - i - 1
+    require(0 <= i && i < length)
+    
+    // Edge case - length = 1
+    if (length == 1) {
+        val aux = head.datum
+        length = length - 1
+        head = null
+        tail = null
+        return aux
+    }
+    // Edge case - remove head
+    if (i == 0) {
+        val aux = head.datum
+        length = length - 1
+        head = head.next
+        head.prev = null
+        return aux
+    }
+    // Edge case - remove tail
+    if (i == length - 1) { 
+        val aux = tail.datum
+        length = length - 1
+        tail = tail.prev
+        tail.next = null
+        return aux
+    }
+    get(head, i)
 }
 
 
@@ -924,7 +924,7 @@ Question 3
 
 (a)
 // Pre:  a is an array of integers and
-//	 n = a.length
+//   n = a.length
 // Post: a is a rearrangement of a0 and
 //       a(i) < a(i + 1) for all 0 <= i < n - 1
 def sort(a: Array[Int], n: Int)
@@ -953,7 +953,7 @@ def ternaryPartition(a: Array[Int], l: Int, r: Int, value: Int): (Int, Int) = {
     var lastUnexplored = r - 1 
     var i = l + 1
     // Invariant: a[l .. r) is a permutation of a0[l .. r) and
-	//			  a(k) = a0(k) for all k not in [l .. r)
+    //            a(k) = a0(k) for all k not in [l .. r)
     //            1 <= l + 1 <= i <= lastUnExplored + 1 <= r <= a.size and
     //            a[l .. firstEqual) < value and
     //            a[firstEqual .. i) = value and
@@ -1102,53 +1102,53 @@ def swap(i: Int, j: Int) {
 }
 
 def partition(l: Int, r: Int, p: Int): Int = {
-	// Invariant: a[l .. r) is a permutation of a0[l .. r) and
-	//			  a(k) = a0(k) for all k not in [l .. r) and
-	//            l <= j <= i <= r and
-	//            a[l .. j) < p <= a[j .. i)
-	var j = l
-	for (i <- l until r)
-		if (a(i) < p) {
-			swap(i, j)
-			j = j + 1
-		}
-	j
+    // Invariant: a[l .. r) is a permutation of a0[l .. r) and
+    //            a(k) = a0(k) for all k not in [l .. r) and
+    //            l <= j <= i <= r and
+    //            a[l .. j) < p <= a[j .. i)
+    var j = l
+    for (i <- l until r)
+        if (a(i) < p) {
+            swap(i, j)
+            j = j + 1
+        }
+    j
 }
 
 
 (b) val k = partition(0, N, p)
 
     (i) If k < p, we know that a[0 .. k) < p, so a contains k < p values in range
-		[0 .. p). Therefore, by the Pigeonhole Principle, there ought to be a missing
-		value x in range [0 .. p), contained in a[0 .. k).
+        [0 .. p). Therefore, by the Pigeonhole Principle, there ought to be a missing
+        value x in range [0 .. p), contained in a[0 .. k).
    (ii) If k >= p, we know that a[0 .. k) < p, so a contains k >= p values in range
-		[0 .. p), meaning that a contains at most N - p values in range [p .. N], which
-		is made up of N - p + 1 integers. Therefore, by the Pigeonhole Principle, there
-		ought to be a missing value x in range [p .. N + 1).
+        [0 .. p), meaning that a contains at most N - p values in range [p .. N], which
+        is made up of N - p + 1 integers. Therefore, by the Pigeonhole Principle, there
+        ought to be a missing value x in range [p .. N + 1).
    
 
 (c)
 def findMissing: Int = {
-	var arrayL = 0; var arrayR = N
-	var l = 0; var r = N + 1
-	// Invariant: a is a permutation of a0 and
-	//            one of the missing values x in a is in [l .. r) and
-	//            l <= a[arrayL .. arrayR) <= r and
-	//            for all 0 <= k < N not in [arrayL .. arrayR), a(k) not in [l .. r] and  
-	// 			  arrayR - arrayL < r - l
-	while (arrayL < arrayR) {
-		val mid = (l + r) / 2
-		val k = partition(arrayL, arrayR, mid)
-		if (k - arrayL < mid - l) {
-			arrayR = k
-			r = mid
-		}
-		else {
-			arrayL = k
-			l = mid
-		}
-	}
-	l
+    var arrayL = 0; var arrayR = N
+    var l = 0; var r = N + 1
+    // Invariant: a is a permutation of a0 and
+    //            one of the missing values x in a is in [l .. r) and
+    //            l <= a[arrayL .. arrayR) <= r and
+    //            for all 0 <= k < N not in [arrayL .. arrayR), a(k) not in [l .. r] and  
+    //            arrayR - arrayL < r - l
+    while (arrayL < arrayR) {
+        val mid = (l + r) / 2
+        val k = partition(arrayL, arrayR, mid)
+        if (k - arrayL < mid - l) {
+            arrayR = k
+            r = mid
+        }
+        else {
+            arrayL = k
+            l = mid
+        }
+    }
+    l
 }
 
 
@@ -1171,18 +1171,18 @@ Where (arrayLi, arrayRi) are the successive values (arrayL, arrayR) takes.
 The invariant tells us that, at all times, arrayR - arrayL < r - l, so our sum is bounded
 from above by
 
-	r0 - l0 +
-	r1 - l1 +
-	...
-	
+    r0 - l0 +
+    r1 - l1 +
+    ...
+    
 Where, similarly, (li, ri) are the successive values (l, r) takes.
 Now, knowing that r - l is about halved (to be rigorous, round N up to the nearest power
 of 2 minus 1) with every iteration of the binary search loop, we may conclude that our
 sum is bounded from above by:
 
-	(r0 - l0) * (1 + 1 / 2 + 1 / 4 + ...) = (N + 1) * 2 = O(N), as expected.
-	
-	
+    (r0 - l0) * (1 + 1 / 2 + 1 / 4 + ...) = (N + 1) * 2 = O(N), as expected.
+    
+    
 Note: There is neat way to solve (c) in linear time, constant additional space and without
 modifying array a at any point during runtime (a clever use of Floyd's Cycle Finding
 Algorithm).
@@ -1199,17 +1199,17 @@ Question 2
 //            has been correctly computed,
 //            according to the definition of rowCount
 for (i <- 0 until N) {
-	// Invariant: 0 <= j <= N and
-	//            For all 0 <= k < j, rowCount(i)(k)
-	//            has been correctly computed,
-	//            according to the definition of rowCount
-	for (j <- 0 until N)
-		if (a(i)(j)) {
-			if (j > 0)
-				rowCount(i)(j) = 1 + rowCount(i)(j - 1)
-			else
-				rowCount(i)(j) = 1
-		}
+    // Invariant: 0 <= j <= N and
+    //            For all 0 <= k < j, rowCount(i)(k)
+    //            has been correctly computed,
+    //            according to the definition of rowCount
+    for (j <- 0 until N)
+        if (a(i)(j)) {
+            if (j > 0)
+                rowCount(i)(j) = 1 + rowCount(i)(j - 1)
+            else
+                rowCount(i)(j) = 1
+        }
 }
 
 
@@ -1233,32 +1233,32 @@ get an area of (k - i) * (j - x) = (k - i) * (min of rowCount(p)(j) over i <= p 
 expected.
 
 def maxRectangleAt(i: Int, j: Int): Int = {
-	var minimum = N + 1 // = INF
-	var ans = 0
-	// Invariant: i + 1 <= k <= N + 1 and
-	//            minimum = min(rowCount[i .. (k - 1))(j) and
-	//            ans = max{(p - i) * min{rowCount(m)(j): i <= m < p}: i < p < k}
-	for (k <- i + 1 to N) {
-		if (rowCount(k - 1)(j) < minimum)
-			minimum = rowCount(k - 1)(j)
-		val aux = (k - i) * minimum
-		if (aux > ans)
-			ans = aux
-	}
-	ans
+    var minimum = N + 1 // = INF
+    var ans = 0
+    // Invariant: i + 1 <= k <= N + 1 and
+    //            minimum = min(rowCount[i .. (k - 1))(j) and
+    //            ans = max{(p - i) * min{rowCount(m)(j): i <= m < p}: i < p < k}
+    for (k <- i + 1 to N) {
+        if (rowCount(k - 1)(j) < minimum)
+            minimum = rowCount(k - 1)(j)
+        val aux = (k - i) * minimum
+        if (aux > ans)
+            ans = aux
+    }
+    ans
 }
 
 
 (c)
 def maxRectangle = {
-	var ans = 0
-	for (i <- 0 until N)
-		for (j <- 0 until N) {
-			val ansHere = maxRectangleAt(i, j)
-			if (ansHere > ans)
-				ans = ansHere
-		}
-	ans
+    var ans = 0
+    for (i <- 0 until N)
+        for (j <- 0 until N) {
+            val ansHere = maxRectangleAt(i, j)
+            if (ansHere > ans)
+                ans = ansHere
+        }
+    ans
 }
 
 Note: There is a standard way to do this in O(N^2) time using the same rowCount array
@@ -1275,18 +1275,18 @@ Question 3
 val head = new Node(Int.MinValue)
 val tail = new Node(Int.MaxValue)
 for (i <- 0 until NumLevels) {
-	head.nexts(i) = tail
-	tail.nexts(i) = null // Although hopefully this
-						 // should never get used
+    head.nexts(i) = tail
+    tail.nexts(i) = null // Although hopefully this
+                         // should never get used
 }
 
 
 (b)
 def getList(node: Node, level: Int): List[Node] = {
-	if (node == tail)
-		List(node)
-	else
-		List(node) ++ getList(node.nexts(level), level)
+    if (node == tail)
+        List(node)
+    else
+        List(node) ++ getList(node.nexts(level), level)
 }
 
 // Abs: lst = getList(head, 0).map(n => n.datum)
@@ -1307,49 +1307,49 @@ def getList(node: Node, level: Int): List[Node] = {
 
 (c)
 def findPreds(x: Int): Array[Node] = {
-	var currentLevel = NumLevels - 1
-	var node = head
-	val ans = new Array[Node](NumLevels)
-	while (currentLevel >= 0) {
-		if (node.nexts(currentLevel).datum < x)
-			node = node.nexts(currentLevel)
-		else {
-			ans(currentLevel) = node
-			currentLevel = currentLevel - 1
-		}
-	}
-	ans
+    var currentLevel = NumLevels - 1
+    var node = head
+    val ans = new Array[Node](NumLevels)
+    while (currentLevel >= 0) {
+        if (node.nexts(currentLevel).datum < x)
+            node = node.nexts(currentLevel)
+        else {
+            ans(currentLevel) = node
+            currentLevel = currentLevel - 1
+        }
+    }
+    ans
 }
 
 (d)
 def contains(x: Int): Boolean = {
-	val aux = findPreds(x)
-	val nd = aux(0).nexts(0)
-	nd.datum == x
+    val aux = findPreds(x)
+    val nd = aux(0).nexts(0)
+    nd.datum == x
 }
 
 
 (e)
 def add(x: Int) = {
-	val aux = findPreds(x)
-	val cnt = pickLevel
-	val node = new Node(x)
-	for (i <- 0 to cnt) {
-		node.nexts(i) = aux(i).nexts(i)
-		aux(i).nexts(i) = node
-	}
+    val aux = findPreds(x)
+    val cnt = pickLevel
+    val node = new Node(x)
+    for (i <- 0 to cnt) {
+        node.nexts(i) = aux(i).nexts(i)
+        aux(i).nexts(i) = node
+    }
 }
 
 
 (f)
 def delete(x: Int) = {
-	if (contains(x)) {
-		val aux = findPreds(x)
-		val node = aux(0).nexts(0)
-		for (i <- 0 until NumLevels)
-			if (node.nexts(i) != null)
-				aux(i).nexts(i) = node.nexts(i)
-	}   
+    if (contains(x)) {
+        val aux = findPreds(x)
+        val node = aux(0).nexts(0)
+        for (i <- 0 until NumLevels)
+            if (node.nexts(i) != null)
+                aux(i).nexts(i) = node.nexts(i)
+    }   
 }
 
 

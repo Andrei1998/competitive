@@ -79,7 +79,7 @@ int bfs(string word, const bool shouldPrint = false) {
 int main() {
     // Change the input and output file names:
     assert(freopen("knuth_words.txt", "r", stdin));
-    assert(freopen("output.txt", "w", stdout));
+    assert(freopen("output_knuth.txt", "w", stdout));
 
     // Reads the dictionary
     readDict();

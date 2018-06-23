@@ -1,12 +1,8 @@
-DAA Vacation Work
-Andrei-Costin Constantinescu
-
-................................................................................
 -- Sheet 1 --
 
 Question 5
 
-(a) A divide-and-conquer algorithm is one which is based on the divide-and
+(a) A divide-and-conquer algorithm is one which is based on the divide-and-
 conquer design strategy.
 The divide-and-conquer design strategy solves a problem by:
 

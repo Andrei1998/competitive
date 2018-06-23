@@ -1,0 +1,282 @@
+Digital Systems Sheet 3 - Mips 
+
+
+--------------------------------------------------------------------------------
+
+
+Question 9.5
+
+move $5, $3   = add  $5, $3, $0
+clear $5      = add  $5, $0, $0
+li $5, small  = addi $5, $0, small  
+
+Now, for all "big" values I will use the notation that a
+value big := s1 ++ s0, where s0 and s1 are the least and most
+significant 16 bits of big, respectively:
+
+
+li $5, big              = 
+li $5, (s1 ++ s0)       = lui  $5,     twoc(s1)
+					      addi $5, $0, twoc(s0)
+
+lw $5, (s1 ++ s0)($3)   = lui  $at, twoc(s1)
+					      addi $at, $at, $3
+						  lw $5, twoc(s0)($at)
+						  
+addi $5, $3, (s1 ++ s0) = lui $at, twoc(s1)
+					      addi $at, $at, twoc(s0)
+						  add $5, $3, $at
+						  
+beq $5, small, L        = addi $at, $0, small
+					      beq $5, $at, L
+						  
+beq $5, (s1 ++ s0), L   = lui $at, twoc(s1)
+						  addi $at, $at, twoc(s0)
+					      beq $5, $at, L
+
+						  
+--------------------------------------------------------------------------------
+
+						  
+Question 9.6
+
+bz $5, L       = beq $5, $0, L
+bnez $5, L     = bne $5, $0, L
+blt $5, $3, L  = slt $at, $5, $3
+                 bne $at, $0, L
+ble $5, $3, L  = slt $at, $3, $5
+				 beq $at, $0, L
+bgt $5, $3, L  = slt $at, $3, $5
+                 bne $at, $0, L
+bge $5, $3, L  = slt $at, $5, $3
+				 beq $at, $0, L
+
+				 
+--------------------------------------------------------------------------------
+
+
+Question 10.2
+
+int ans = 0, aux = a;
+while (b) {
+	if (b & 1)
+		ans += aux;
+	b >>= 1, aux <<= 1;
+}
+return ans;
+
+mul:
+	li $v0, 0                        # ans = $v0 = 0
+	move $t0, $a0                    # aux = $t0 = $a0
+	while: bz $a1 endWhile           # while (b) {
+		andi $t1, $a1, 1             #     $t1 = $a1 & 1 = b & 1
+		if: bz $t1, endIf            #     if ($t1) {
+			add $v0, $v0, $t0        #         ans = ans + aux = $v0 + $t0		
+		endIf:                       #     }
+		srl $a1, $a1, 1              #     b = $a1 = b >> 1
+		sll $t0, $t0, 1              #     aux = $t0 = aux << 1
+	b while                          # }
+	endWhile:                        #
+	jr $ra
+
+	
+--------------------------------------------------------------------------------
+
+
+Question 10.3
+
+clr $2                           # $2 = 0;
+clr $3                           # total = 0;
+loop:  beq $2, $4, exit          # while (i != n) {
+	   lw $6, a($2)				 #     $6 = *($2);
+	   add $3, $3, $6            #     total += $6;
+	   addi $2, $2, 4            #     $2 += 4;
+	   b loop                    # }
+exit:                            #
+
+
+--------------------------------------------------------------------------------
+
+
+Question 10.7
+
+fact:                           # fact() {
+	subi $sp, $sp, 8            # 
+	sw $ra, 4($sp)				#
+	sw $a0, 0($sp)				#
+	if:	bne $a0, 0, else		#     if (n == 0) {
+		li $v0, 1				#         $v0 = 1;
+		addi $sp, $sp, 8		#     
+		jr $ra					#     }
+	else:						#     else {
+		subi $a0, $a0, 1		#         n -= 1;
+		jal fact				#         fact(n);
+		lw $a0, 0($sp)			#         n += 1;
+		
+		move $a1, $v0           #   
+		mul						#		  $v0 *= n;
+		
+		lw $ra, 4($sp)		    #   
+		addi $sp, $sp, 8		#
+		jr $ra					#     }
+								# }
+
+
+--------------------------------------------------------------------------------
+
+
+Question 10.8
+
+Solution linear in the quotient:
+
+void divMod(int &q, int &r) {
+	q = 0, r = x;
+	while (r >= y) {
+		q += 1;
+		r -= y;
+	}
+}
+
+divMod:
+	li $t0, 0               # q = $t0
+	move $t1, $a0           # r = $t1
+	while: ble $t1, $a1
+		addi $t0, $t0, 1
+		sub $t1, $t1, $a1
+	b while
+	endWhile:
+	jr $ra
+
+	
+Solution logarithmic in the quotient:
+
+void divMod(int &q, int &r) {
+	int y0 = y
+	while (y <= x)
+		y <<= 1	
+	q = 0, r = x
+	while (y != y0) {
+		q <<= 1
+		y >>= 1
+		if (r >= y) {
+			q += 1
+			r -= y
+		}
+	}
+}
+
+div:
+    move $t0, $a1                   # $t0 = y0
+    while1: bltu $a0, $a1, end1     # while (x >= y) {
+        sll $a1, $a1, 1             #     y = y << 1
+    b while1                        # }
+    end1:                           #
+
+    li $t1, 0                       # $t1 = q = 0
+    move $t2, $a0                   # $t2 = r = x
+    while2: beq $a1, $t0, end2      # while (y != y0) {
+         sll $t1, $t1, 1            #     q = 2 * q
+         srl $a1, $a1, 1            #     y = y / 2
+         if1: blt $t2, $a1, endif1  #     if (r >= y) {
+             addi $t1, $t1, 1       #         q = q + 1
+             sub  $t2, $t2, $a1     #         r -= y
+         endif1:                    #     }
+    b while2                        # }
+    end2:                           #
+    move $v0, $t1                   # $v0 = q
+    move $v1, $t2                   # $v1 = r
+    jr $ra                          #
+
+	
+--------------------------------------------------------------------------------
+
+
+Question 10.10
+
+bool prime(int x) {
+	if (x == 1)
+		return false;
+	else if (x == 2)
+		return true;
+	
+	int i = 1;
+	while (1) {
+		i += 1;
+		q = x / i;
+		r = x % i;
+		if (r == 0)
+			return false;
+		if (i > q)
+			return true;
+	}
+}
+
+prime:                              #  prime() { //$a0 = x
+    li $t1, 1                       #     
+    li $t2, 2                       #
+    bne $a0, $t1, check2            #      if (x == 1)
+        li $v0, 0                   #          return 0
+        jr $ra                      #
+    check2: bne $a0, $t2, done      #      else if (x == 2)
+        li $v0, 1                   #          return 1
+        jr $ra                      #
+    done:                           #
+
+    subi $sp, $sp, 12               #      // Allocate stack memory
+    sw   $s0, 0($sp)                #
+
+    li $s0, 1                       #      i = 1  // $s0 = i
+    while:                          #      while (1) {
+        addi $s0, $s0, 1            #          i += 1
+
+        sw $a0, 4($sp)              #          q = x / i  // $v0 = q
+        sw $ra, 8($sp)              #          r = x % i  // $v1 = r
+        move $a1, $s0               #
+        jal div                     #
+        lw $ra, 8($sp)              #
+        lw $a0, 4($sp)              #
+
+        bnez $v1, if2               #          if (r == 0) {
+            li $v0, 0               #              return 0
+            lw $s0, 0($sp)          #   	   }
+            addi $sp, $sp, 12       #
+            jr $ra                  #
+        if2: ble $s0, $v0, while    #          if (i > q) { // i > x / i  <=>  
+                                    #                       // i * i > x  <=>  i > sqrt(x)
+            li $v0, 1               #              return 1
+            lw $s0, 0($sp)          #		   }
+            addi $sp, $sp, 12       #
+            jr $ra                  #
+                                    #      }
+                                    #  }
+
+	
+--------------------------------------------------------------------------------
+
+
+Question 12.1
+
+ldl n = sp      # sp -= 4; m[sp] = sp 
+        li n    # sp -= 4; m[sp] = n
+        add     # m[sp + 4] += m[sp]; sp += 4
+        ld      # m[sp] = m[m[sp]]
+
+
+Advantage: This makes up for a simpler reduced instruction
+		   set, just as strong as the usual one.
+
+Disadvantage:  Writing out the usual ldl instruction requires
+			   4 instructions from the set, which is quite a bit of overhead.
+
+			   
+--------------------------------------------------------------------------------
+
+
+Question 12.2
+
+First of all, the two versions (i.e. the one which pops the stack and the one which
+doesn't) are functionally equivalent (one can be seen as a pseudoinstruction which can
+be implemented in terms of the other one and some number of other proper instructions).
+Now, one reason to implement the no-pop version is to facilitate writing operations
+such as the short-circuiting multiway AND.
+

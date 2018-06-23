@@ -1,0 +1,257 @@
+Question 1
+
+class FilterIterator[T] (test: T => Boolean, it: Iterator[T]) extends Iterator[T]{
+    var iter: Iterator[T] = it
+    def hasNext: Boolean = {
+        iter = iter.dropWhile(x => !(test(x))) // Why does it stop working without the "iter = " part?
+        iter.hasNext
+    }
+    def next() = {
+        iter = iter.dropWhile(x => !(test(x)))
+        iter.next
+    }
+}
+
+val s: String = "abc"
+var iter: FilterIterator[Char] = new FilterIterator[Char](x => (x == 'a') || (x == 'c'), s.iterator)
+while (iter.hasNext)
+    println(iter.next) // a c
+
+val s: String = "abc"
+var iter: FilterIterator[Char] = new FilterIterator[Char](x => (x == 'x') || (x == 'y'), s.iterator)
+while (iter.hasNext)
+    println(iter.next) //
+
+val s: String = "abc"
+var iter: FilterIterator[Char] = new FilterIterator[Char](x => (x == 'a') || (x == 'y'), s.iterator)
+while (iter.hasNext)
+    println(iter.next) // a
+
+val s: String = "abc"
+var iter: FilterIterator[Char] = new FilterIterator[Char](x => (x == 'c') || (x == 'b'), s.iterator)
+while (iter.hasNext)
+    println(iter.next) // b c
+
+
+....................................................................................................
+
+
+Question 2
+
+trait Command[T] {
+    def execute(target: T): Option[Change]
+}
+trait Change {
+    def undo(): Unit
+}
+
+/* State: balance: Int */ // Init?
+trait Account {
+    // Post: balance = balance0 + amount
+    def deposit(amount: Int)
+    
+    // Post: if amount <= balance then balance = balance0 - amount
+    //                            else balance = balance0
+    def withdraw(amount: Int): Boolean
+    
+    // Post: balance = balance0 and
+    //                 returns balance
+    def balance: Int
+}
+
+class BasicAccount(private var _balance: Int) extends Account {
+    def deposit(amount: Int) = _balance += amount 
+    def balance = _balance
+    
+    def withdraw(amount: Int): Boolean = {
+        if (amount <= _balance) {
+            _balance -= amount
+            true
+        }
+        else
+            false
+    }
+}
+
+class DepositCommand(amount: Int) extends Command[Account] {
+    def execute(target: Account): Option[Change] = {
+        target.deposit(amount)
+        Some(new Change {
+            override def undo() = target.withdraw(amount)
+        })
+    }
+}
+
+class WithdrawCommand(amount: Int) extends Command[Account] {
+    def execute(target: Account): Option[Change] = {
+        val result = target.withdraw(amount)
+        if (!result)
+            None
+        else {
+            Some(new Change {
+                override def undo() = target.deposit(amount)       
+            })
+        }
+    }
+}
+
+val ac1 = new BasicAccount(50)
+val d10 = new DepositCommand(10)
+val w5 = new WithdrawCommand(5)
+d10.execute(ac1)
+println("Balance is: " + ac1.balance) // 60
+val uw5 = w5.execute(ac1)
+println("Balance is: " + ac1.balance) // 55
+uw5 match {
+    case None => println("No success!")
+    case Some(x) => {
+        println("Undo done!") // Undo done!
+        x.undo
+    }
+}
+println("Balance is: " + ac1.balance) // 60
+
+
+....................................................................................................
+
+
+Question 3
+
+class InsertCommand(x: Int) extends Command[PriorityQueue] {
+    def execute(target: PriorityQueue): Option[Change] = {
+        target.insert(x)
+        Some(new Change {
+            def undo = target.remove(x)
+        })
+    }
+}
+
+class DelMinCommand extends Command[PriorityQueue] {
+    def execute(target: PriorityQueue): Option[Change] = {
+        if (!target.isEmpty) {
+            val aux = target.delMin
+            Some(new Change {
+                def undo = target.insert(aux) 
+            })
+        }
+        else
+            None
+    }
+}
+
+
+....................................................................................................
+
+
+Question 4
+
+(a)
+class AndThenCommand[T](first: Command[T], second: Command[T]) extends Command[T] {
+    def execute(target: T): Option[Change] = {
+        val res = first.execute(target)
+        res match {
+            case None    => None
+            case Some(r) => {
+                val res2 = second.execute(target)
+                res2 match {
+                    case None => {
+                        r.undo
+                        None
+                    }
+                    case Some(r2) => {
+                        Some(new Change {
+                            def undo = {
+                                r2.undo
+                                r.undo
+                            } 
+                        })
+                    }
+                }
+            }
+        }
+    }
+}
+
+(b)
+def makeTransaction[T](commands: List[Command[T]]): Command[T] = new Command[T] {
+    def execute(target: T): Option[Change] = {
+        commands match {
+            case Nil => Some(new Change {def undo = {}})
+            case x :: Nil  => x.execute(target)
+            case x :: tail => new AndThenCommand[T](x, makeTransaction[T](tail)).execute(target) 
+        }
+    }   
+}
+
+(c)
+val ac1 = new BasicAccount(50)
+val ac1 = new BasicAccount(50)
+val d10 = new DepositCommand(10)
+val w5 = new WithdrawCommand(5)
+val t = makeTransaction(List(d10,d10,w5,d10,w5))
+val c1 = t.execute(ac1)
+println("Balance is: " + ac1.balance) // 70
+c1.get.undo()
+println("Balance is: " + ac1.balance) // 50
+
+
+....................................................................................................
+
+
+Question 5
+
+(a)
+class WhileCommand[T](test:T => Boolean, cmd:Command[T]) extends Command[T] {
+    def execute(target: T): Option[Change] = {
+        if (!test(target))
+            Some(new Change {def undo = {}})
+        else {
+            val res = cmd.execute(target)
+            res match {
+                case None    => None
+                case Some(r) => {
+                    val res2 = execute(target)
+                    res2 match {
+                        case None => {
+                            r.undo
+                            None
+                        }
+                        case Some(r2) => Some (new Change {
+                            def undo = {
+                                r2.undo
+                                r.undo
+                            }
+                        })
+                    }
+                }
+            }
+            
+        }
+    }
+}
+
+(b)
+def threshold(limit: Int): Boolean = {
+    if (isEmpty)
+        return false
+    
+    val m = delMin
+    insert(m)
+    return m < limit
+}
+
+
+....................................................................................................
+
+
+Question 7
+
+n * n may overflow and even if it wouldn't scala.math.sqrt may produce an answer which is
+off by (possibly more than) one due to rounding issues. Correcting for the second issue is
+pretty hard to do without modifying the code structure, but casting n to Double before
+executing the multiplication should correct for the integer overflow issue:
+
+scala.math.sqrt(n.toDouble * n.toDouble)
+
+One last issue that needs to be corrected for are negative numbers - change n into
+abs(n).

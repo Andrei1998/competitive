@@ -1,0 +1,165 @@
+Question 1
+
+trait Shape
+
+class Rectangle(var width: Int, var height: Int) extends Shape {}
+class Square(var side: Int) extends Shape {}
+class Ellipse(var smaj: Int, var smin: Int) extends Shape {}
+class Circle(var radius: Int) extends Shape {}
+
+// Say sets are represented as lists
+val l: List[Shape] = List(new Square(2), new Rectangle(3, 4), new Circle(4)) 
+
+val squares = l.filter(_.isInstanceOf[Square]) // Identifies Squares
+val circles = l.filter(_.isInstanceOf[Circle]) // Identifies Circles 
+
+Note: A different solution uses case classes and
+      pattern matching to avoid the use of isInstanceOf[]
+
+
+-----------------------------------------------------------------------------------------
+
+
+Question 2
+
+Area ought to be a property, rather than a state variable,
+so something on the lines of exchanging "var area" for "def area"
+should resolve this issue.
+
+
+-----------------------------------------------------------------------------------------
+
+
+Question 3
+
+The invariant may easily be invalidated by changing a slab dimension's width
+field (a var):
+
+   val s: Slab = new Slab(new Rectangle(2, 3))
+   s.dimension.height = 4
+   s._area = 6 != 8    
+
+To improve the design:
+1) Remove the private keyword and the accessor method, as this will
+   achieve the same functionality.
+2) Turn area into an attribute by changing "val _area" into "def area".
+
+
+-----------------------------------------------------------------------------------------
+   
+
+Question 4
+
+r1.accept(a) // "Accepted for rendering.", because the only accept function
+			 // that is a member of the Renderer class is being called
+			 // on an OpaqueTriangle (which extends Triangle, so there should be
+			 // no issue in doing that).
+r2.accept(a) // "Accepted for ray-trace rendering.", because of the two
+		     // members of RayTracingRenderer, the most particular one is being
+			 // called (which is a direct member of RayTracingRenderer).
+
+To get the output of r1.accept(a) to change modify RayTracingRenderer accordingly:
+
+class RayTracingRenderer extends Renderer {
+	override def accept(a: Triangle) = println("Accepted for ray-trace rendering.")
+}
+
+This will make r1.accept(a) to output "Accepted for ray-trace rendering.", due
+to Scala using dynammic binding by default.
+
+
+-----------------------------------------------------------------------------------------
+
+
+Question 5
+
+class Ellipse(private var _a: Int, private var _b: Int) {
+	def a = _a
+	def a_=(a: Int) = {_a = a}
+	def b = _b
+	def b_=(b: Int) = {_b = b}
+	
+	// No need to override in LoggedEllipse
+	def exch1 = {
+		val aux = a
+		a = b
+		b = aux
+	}
+
+	// Override needed - illustrates the "Fragile Base Class" problem
+	def exch2 = {
+		val aux = _a
+		_a = _b
+		_b = aux
+	}
+}
+
+class LoggedEllipse(private var _a: Int, private var _b: Int)
+	extends Ellipse(_a, _b) {
+	private var increases = 0
+
+	def getIncreases = increases
+	
+	override def a_=(a: Int) = {
+		if (a > _a)
+			increases = increases + 1
+		_a = a
+	}
+	override def b_=(b: Int) = {
+		if (b > _b)
+			increases = increases + 1
+		_b = b
+	} 
+}
+
+
+-----------------------------------------------------------------------------------------
+
+
+Question 6
+
+(a) This is called "composition" and is the industry goto for avoiding inheritance:
+class PlaneText {
+	private val text: Text = new Text
+    ...
+}
+
+(b) Define a container trait which both Text and PlaneText inherit from:
+trait Transmittable
+class Text extends Transmittable { ... }
+class PlaneText extends Transmittable { ... }
+
+(c) 1. Text and PlaneText become less tightly coupled, which is surely a benefit,
+       as the fragile class problem basically disappears.
+    2. Another benefit is avoiding complexity.
+    3. A problem is that no inheritance makes for one having to explicitly write
+       out more methods (as they've lost the ability to be implicitly inherited).
+    4. Also, every function call has to be forwarded to a different class, adding
+       to the overhead.
+	   
+	   
+-----------------------------------------------------------------------------------------
+
+
+Question 7
+
+This easily fails on any test involving the standard collections:
+val r1, r2 = new Rectangle(1, 2)
+val coll = HashSet(r1)
+coll contains r2 // false != true
+
+// A proper Rectangle class:
+class Rectangle(val width: Int, val height: Int) {
+	// Proper overriding of equals, defines an equivalence relation
+	override def equals(other: Any): Boolean = other match {
+		case that: Rectangle => that.canEqual(this) &&
+								this.width == that.width && this.height == that.height
+		case _ => false
+	}
+
+	override def hashCode = 41 * width + height // For use with HashSet etc.
+
+	def canEqual(other: Any) = other.isInstanceOf[Rectangle] // For derived classes
+															 // that don't override
+															 // equals
+} 

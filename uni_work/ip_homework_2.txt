@@ -1,0 +1,167 @@
+// Question 3
+import org.scalatest.FunSuite
+class ArrayTests extends FunSuite{
+    // Should this be redeclared each time?
+    val v = Array(2, 3, 1, 5, 5, 6, 7, 6, 0, -1) 
+    
+    test("Sorting in ascending order") {
+        assert(v.sorted.deep == Array(-1, 0, 1, 2, 3, 5, 5, 6, 6, 7).deep)
+    }
+    test("Sorting in descending order") {
+        assert(v.sortWith(_ > _).deep == Array(-1, 0, 1, 2, 3, 5, 5, 6, 6, 7).reverse.deep)
+    }
+    test("Testing sum and map utilities") {
+        assert(v.sum == Array(-1, 0, 1, 2, 3, 5, 5, 6, 6, 7).sum)
+        assert(v.map(_ * 2).deep == Array(2 * 2, 3 * 2, 1 * 2, 5 * 2, 5 * 2, 6 * 2, 7 * 2, 6 * 2, 0 * 2, -1 * 2).deep)
+    }    
+}
+
+
+----------------------------------------------------------------------------------------------------
+
+
+// Question 4
+Answer in attached addendum (Errata: contains an error - it actually both overcount and undercount).
+
+
+----------------------------------------------------------------------------------------------------
+
+
+// Question 5
+import org.scalatest.FunSuite
+import Search.search
+class SearchTests extends FunSuite{
+    // Fails (a), (c), (d)
+    test("\"a\" doesn't appear in \"b\"") {
+        assert(search("a".toArray, "b".toArray) == false)
+    }
+
+    // Fails (b), (e)
+    test("\"b\" does appear in \"ab\"") {
+        assert(search("b".toArray, "ab".toArray) == true)
+    }
+    
+    // The code is still correct for (f)
+}
+
+
+----------------------------------------------------------------------------------------------------
+
+
+object Main extends App {
+    // Question 6
+    def minPeriod(s: Array[Char]): Int = {
+        val N = s.length
+        
+        // Takes an Array[Char] s and 2 indices inside it [i, j) and returns s[i .. j)
+        def extractSubstr(s: Array[Char], i: Int, j: Int): Array[Char] = {
+            val ans = new Array[Char](j - i) // Creates a new Array[Char] to store the answer
+            // I: 0 <= k <= N and ans[0 .. (k - i)) = s[i .. k]
+            for (k <- i until j)
+                ans(k - i) = s(k)
+            ans 
+        }
+        
+        // I: 0 <= n <= N and for all x s.t. 0 <= x < n we have that s[0 .. N - x) != s[x, N)
+        var n = 1
+        while (n < N && extractSubstr(s, 0, N - n).mkString != extractSubstr(s, n, N).mkString)
+            n += 1 // I
+        n // I and either n = N or s[0 .. N - n) == s[n, N) (in which case n is the smallest period, as required)
+    }
+    
+	println(minPeriod("abcabc".toArray)) // 3
+    println(minPeriod("abcac".toArray))  // 5
+
+	
+	----------------------------------------------------------------------------------------------------
+
+
+    // Question 7
+    def exists(p: Int => Boolean, N: Int): Boolean = {
+        var i = 0 // I: 0 <= i <= N and p(j) is false for all 0 <= j < i
+        while (i < N && !p(i)) // I
+            i += 1 // I
+        i < N // I and either i = N (in which case we return false) or i < N and p(i) (in which
+              // case we return true)
+    }
+    
+    // This function returns true if a (positive) integer has 3 digits in decimal
+    val threedigits:(Int=>Boolean) = i => {i >= 100 && i<1000}
+    
+    println(exists(threedigits, 100)) // false
+    println(exists(threedigits, 101)) // true
+    
+    // Question 8
+    /* (a) 1 / m <= p / q
+     * <=> m >= q / p
+     * The smallest m satisfying this is ceil(q / p)
+     * Or, in Scala m = (q + p - 1) / p
+     */
+	 
+    // (b)
+    def egyptian(p: Int, q: Int): Array[Int] = {
+        var a = p; var b = q
+        val d = new Array[Int](2) // Resize as deemed necessary
+        var index = 0 // I: 0 <= index and p / q = a / b + 1 / d[0] + 1 / d[1] + ... + 1 / d[index - 1]
+        while (a > 0) { // I
+            val m = (b + a - 1) / a
+            d(index) = m
+            a = m * a - b; b *= m // a / b -= 1 / m
+            index += 1 // I
+        }
+        d // I and a = 0 => p / q = 1 / d[0] + ... + 1 / d[index - 1], as required
+    }
+	
+    println(egyptian(3, 5).deep.mkString(" ")) // 2 10
+    println(egyptian(5, 6).deep.mkString(" ")) // 2 3
+    
+	/* (c)
+     * Let's show that the old p (a > 0) is strictly smaller that the new p (a * m - b):
+     * a * m - b = a * ceil(b / a) - b <= a * (floor(b / a) + 1) - b = a - (b - a * floor(b / a))
+     *                                                               = a - b % a <= a
+     * Which has just established that the new p can no exceed the old p.
+     * All that's left to be done is ruling out the case when p doesn't change.
+     * We can see that we only need to look at the b % a = 0 case (as the last inequality in the above proof is strict
+     * in all cases but b % a = 0). But, in this case a * m - b = a <=> a * (b / a) - b = a <=> b - b = a <=> a = 0,
+     * which is not of interest.
+     */
+		
+	
+	----------------------------------------------------------------------------------------------------
+
+	
+    // Question 9
+    def log3(n: Int): Int = {
+        require(n > 0)
+        var ans = 0; var x = n // I: x >= 1 and [log3(n)] = ans + [log3(x)]
+        while (x >= 3) { // I
+            ans += 1 // [log3(n)] = ans + 1 + [log3(x / 3)] 
+            x /= 3 // I
+        }
+        ans // I and x < 3, so [log3(n)] = ans + [log3(x)] = ans
+    }
+    
+	println(log3(1)) // 0
+    println(log3(2)) // 0
+    println(log3(3)) // 1
+    println(log3(8)) // 1
+    println(log3(9)) // 2
+	
+	
+	----------------------------------------------------------------------------------------------------
+
+
+    // Question 10
+    def eval(a: Array[Double], x: Double) : Double = {
+        val N = a.length
+        var i = N - 1; var ans = 0.0 // I: -1 <= i < N and ans = a[i + 1] + a[i + 2] * x + a[i + 3] * x^2 + ... + a[N - 1] * x^(N - i - 2)
+        while (i >= 0) {
+            ans *= x    // ans = a[i + 1] * x + a[i + 2] * x^2 + a[i + 3] * x^3 + ... + a[N - 1] * x^(N - i - 1)
+            ans += a(i) // ans = a[i] + a[i + 1] * x + a[i + 2] * x^2 + a[i + 3] * x^3 + ... + a[N - 1] * x^(N - i - 1)
+            i -= 1      // I
+        }
+        ans // I and i = -1, so ans = a[0] + a[1] * x + a[2] * x^2 + ... + a[N - 1] * x^(N - 1), as required
+    }
+    
+	println(eval(Array(1.0, 1.0), 3.0)) // 4.0
+}

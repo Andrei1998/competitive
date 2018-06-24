@@ -690,7 +690,7 @@ def longestRepeated = {
 As guided by the previous parts, we compute the suffix array of a by calling the
 appropriate part (e) function and then only consider (i, i + 1) pairs, as showed to be
 enough in part (c). The total complexity is O(N * bestk * log N) for the suffix array and
-O(N * bestk) for the remaining checks, totalling to O(N * bestk * log N).
+O(N * bestk) for the remaining checks, totaling to O(N * bestk * log N).
 
 Note: 
 There are numerous linear time algorithms for computing the suffix array, such as the
@@ -1181,11 +1181,6 @@ of 2 minus 1) with every iteration of the binary search loop, we may conclude th
 sum is bounded from above by:
 
     (r0 - l0) * (1 + 1 / 2 + 1 / 4 + ...) = (N + 1) * 2 = O(N), as expected.
-    
-    
-Note: There is neat way to solve (c) in linear time, constant additional space and without
-modifying array a at any point during runtime (a clever use of Floyd's Cycle Finding
-Algorithm).
 
 
 ..........................................................................................

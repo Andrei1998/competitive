@@ -1,4 +1,168 @@
-Digital Systems Sheet 3 - Mips 
+Question 8.3
+
+data Op = Add | Mul | Sub | Div | RSub | RDiv 
+
+op_flip :: Op -> Op
+op_flip Add = Add
+op_flip Sub = RSub
+op_flip Mul = Mul
+op_flip Div = RDiv
+
+operate :: Op -> (Value -> Value -> Value)
+operate Add = (+)
+operate Sub = (-)
+operate Mul = (*)
+operate Div = div
+operate RSub = flip (-)
+operate RDiv = flip div
+
+combineM (il, hl) (ir, hr) op  = if    hl > hr
+                                 then (il ++ ir ++ [Do op],           max hl (hr + 1))
+                                 else (ir ++ il ++ [Do (op_flip op)], max (hl + 1) hr)
+
+compileOpt expr = case expr of
+   Num n      -> ([PushN n], 1)
+   Var v      -> ([PushV v], 1)
+   Bin l op r -> combineM (compileOpt l) (compileOpt r) op
+
+
+Above I've implemented the idea that defines new arithmetic operations for
+flip div and flip (-). This idea is less "general" (meaning harder to implement
+in practice), but, provided these 2 new operations get to be hardware implemented,
+much faster in practice and requiring fewer machine instructions.
+
+The other method is more general, only requiring a single extra machine operation
+to be implemented, no matter how many non-commutative operations exist.
+It will, unfortunately, inevitably lead to a slight slowdown due to
+all the extra Swap instructions that are not needed.
+
+
+--------------------------------------------------------------------------------
+
+
+Question 8.2
+   
+eval store expr = exec store (compileS expr)
+
+<=> {definition of exec}
+eval store expr = answer (foldl step (store, []) (compileS expr))
+				 where answer (store, [v]) = v
+
+If we could show that foldl step (store, []) (compileS expr) = (store, eval store expr)
+held true, then we'd be done, as answer (store, eval store expr) = eval store expr, by definition.
+
+To prove this, we'll actually prove a slightly stronger result, namely:
+
+foldl step (store, stack) (compileS expr) = (store, eval store expr : stack)
+	
+Proceed by induction on expr:
+
+
+We'll skip the expr = bottom case, as infinite lists
+have no practical significance in this context.
+
+
+Now, there are 3 more cases depending on which pattern does expr match:
+
+1. foldl step (store, stack) (compileS (Num n)) = (store, eval store expr : stack)
+
+<=> {definition of compileS}
+  foldl step (store, stack) [PushN n]) = (store, eval store expr : stack)
+
+<=> {definition of foldl}
+  foldl step (store, n : stack) [] = (store, eval store expr : stack)
+ 
+<=> {definition of foldl
+  (store, n : stack) = (store, eval store expr : stack)
+
+<=> {definition of (==) on pairs}
+  n : stack = eval store expr : stack
+
+<=> {two lists are equal iff their heads are equal and their tails are equal}
+  n = eval store expr
+  
+<=> {expr = Num n}
+  n = eval store (Num n)
+  
+<=> {definition of eval}
+  n = n, obviously true
+  
+  
+2. foldl step (store, stack) (compileS (Var v)) = (store, eval store expr : stack)
+
+The proof in this case is virtually identical to 2., the only differences standing
+in the fact that step (store, stack) (PushV v) = (store, store `at` v : stack)
+and eval store (Var v) = store `at` v. In the end we will similarly reach:
+
+  store `at` v = store `at` v, obviously true
+  
+ 
+3. Inductive hypothesis:
+
+Assume that:
+a) foldl step (store, stack) (compileS l) = (store, eval store l : stack)
+b) foldl step (store, stack) (compileS r) = (store, eval store r : stack)
+For all valid values of stack
+
+Inductive step:
+   foldl step (store, stack) (compileS (Bin l op r)) = (store, eval store (Bin l op r) : stack)
+
+<=> {definition of compileS}
+   foldl step (store, stack) (compileS l ++ compileS r ++ [Do op]) = (store, eval store (Bin l op r) : stack)
+
+<=> {definition of eval}
+   foldl step (store, stack) (compileS l ++ compileS r ++ [Do op]) = (store, operate op (eval store l) (eval store r) : stack)
+
+<=> {foldl f e (xs ++ ys) = foldl f (foldl f e xs) ys}
+   foldl step (foldl step (store, stack) (compileS l)) (compileS r ++ [Do op]) = (store, operate op (eval store l) (eval store r) : stack)
+
+<=> {inductive hypothesis part a)}
+   foldl step (store, eval store l : stack) (compileS r ++ [Do op]) = (store, operate op (eval store l) (eval store r) : stack)
+
+<=> {foldl f e (xs ++ ys) = foldl f (foldl f e xs) ys}
+   foldl step (foldl step (store, eval store l : stack) (compileS r)) [Do op] = (store, operate op (eval store l) (eval store r) : stack)
+
+<=> {inductive hypothesis part b)}
+   foldl step (store, eval store r : eval store l : stack) [Do op] = (store, operate op (eval store l) (eval store r) : stack)
+   
+<=> {definition of foldl}
+   foldl step (store, step (eval store r : eval store l : stack) (Do op)) [] = (store, operate op (eval store l) (eval store r) : stack)
+
+<=> {definition of foldl}
+   (store, step (eval store r : eval store l : stack) (Do op)) = (store, operate op (eval store l) (eval store r) : stack)
+
+<=> {definition of tuple equality}
+   step (eval store r : eval store l : stack) (Do op) = operate op (eval store l) (eval store r) : stack
+   
+<=> {definition of step}
+   operate op (eval store l) (eval store r) : stack = operate op (eval store l) (eval store r) : stack, obviously true
+
+
+Thus, as all these hold true, by the principle of structural induction over Expr, 
+   foldl step (store, stack) (compileS expr) = (store, eval store expr : stack)
+for all valid stacks and expr a finite expression, and hence follows our main correctness result.
+
+
+--------------------------------------------------------------------------------
+
+
+Question 9.8
+
+type Reg = Int
+type Env = [(String, Reg)]
+
+compileM :: Env -> [Reg] -> Expr -> String
+compileM env (r : free)       (Num n)      = printLoad r n
+compileM env (r : free)       (Var v)      = printMove r (env ‘at‘ v)
+compileM env (r0 : r1 : free) (Bin l op r) = compileM env (r0 : r1 : free) l ++
+                                             compileM env (r1 : free)      r ++
+											 printOp op r0 r0 r1
+			 
+printLoad   r  n     = "ori $" ++ (show r)  ++ ", $0, "  ++ (show n)                        ++ "\n"
+printMove   r1 r2    = "add $" ++ (show r1) ++ ", $0, $" ++ (show r2)                       ++ "\n"
+printOp Add r1 r2 r3 = "add $" ++ (show r1) ++ ", $"     ++ (show r2) ++ ", $" ++ (show r3) ++ "\n"
+printOp Sub r1 r2 r3 = "sub $" ++ (show r1) ++ ", $"     ++ (show r2) ++ ", $" ++ (show r3) ++ "\n"
+printOp Mul r1 r2 r3 = "mul $" ++ (show r1) ++ ", $"     ++ (show r2) ++ ", $" ++ (show r3) ++ "\n"
 
 
 --------------------------------------------------------------------------------

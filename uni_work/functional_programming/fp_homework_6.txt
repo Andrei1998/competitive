@@ -1,0 +1,164 @@
+11.1
+
+foldBool f t False = f
+foldBool f t True  = t
+
+foldDay su m tu w th f sa Sunday    = su
+foldDay su m tu w th f sa Monday    = m
+foldDay su m tu w th f sa Tuesday   = tu
+foldDay su m tu w th f sa Wednesday = w
+foldDay su m tu w th f sa Thursday  = th
+foldDay su m tu w th f sa Friday    = f
+foldDay su m tu w th f sa Saturday  = sa
+
+
+-------------------------------------------------------
+
+
+11.2
+
+False <= False = True
+False <= True  = True
+True  <= False = False
+True  <= True  = True
+
+So, (<=) = logical implication 
+
+
+-------------------------------------------------------
+
+
+11.3
+
+isIn x s = foldSet False (==x) (||) s
+subset a b = foldSet True (\x -> isIn x b) (&&) a
+
+instance Eq a => Eq (Set a) where
+  xs == ys = (xs ‘subset‘ ys) && (ys ‘subset‘ xs)
+
+Ask: There are some issues with infintie Sets.
+
+
+-------------------------------------------------------
+
+
+12.1
+
+type Queue a = [a]
+
+empty     = []        -- constant time
+isEmpty q = null q    -- constant time
+add a q   = q ++ [a]  -- linear in the number of elements in q
+pop   q | isEmpty q = error "Empty queue!"
+        | otherwise = (head q, tail q)     -- constant time
+
+By maintaining the list in reversed order, add runs in constant
+time, but pop requires linear time.
+
+Now, for the more optimized queue:
+
+type Queue a = ([a], [a])
+
+empty          = ([], [])            -- constant time
+isEmpty (f, b) = null f && null b    -- constant time
+add a   (f, b) = (f, a : b)          -- constant time
+pop     (f, b) | not $ null b = (head b, (f, tail b)) -- constant time
+               | not $ null f = pop ([], reverse f)   -- amortized constant time
+               | otherwise    = error "Empty queue!"
+
+All operations run in constant time, other than pop, which runs in amortized
+constant time, as every number which is pushed into the queue is transfered from
+the front list to the back list exactly once, and thus the total complexity of all
+reverses is linear, even though one single pop operation may take linear time by
+itself.
+
+
+-------------------------------------------------------
+
+
+12.2
+
+The calls for fib 20 and fib 30 are extremely slow as one
+may notice that the time complexity of the given recursion
+algorithm is T1(n) = O(fib(n)) (easily provable by induction).
+
+two 0 = (0, 1)
+two n = (b, a + b)
+        where (a, b) = two (n - 1)
+
+fib n = (fst . two) n
+
+The time complexity of the new fib function is T2(n) = O(n).
+
+*Main> roughly $ fib 10000
+"3e2089"
+
+The fact that
+
+F^n = (fib (n - 1)  fib n      )
+      (fib n        fib (n + 1))
+
+is trivially provable by induction, so I will only sketch the inductive step:
+
+F^n * F = (fib (n - 1)  fib n      ) * (0 1) = (fib n        fib (n - 1) + fib n)
+          (fib n        fib (n + 1))   (1 1)   (fib (n + 1)  fib n + fib (n + 1))
+
+	= (fib n        fib (n + 1)) (as, required)
+	  (fib (n + 1)  fib (n + 2))
+
+
+From lecture:
+power (*) y x n -- x^n*y
+  | n == 0 = y
+  | even n = power (*) y (x*x) (n`div`2)
+  | odd n  = power (*) (x*y) x (n-1)
+
+From sheet 4:
+type Matrix a = [[a]]
+dot v1 v2 = sum (zipWith (*) v1 v2)
+mul a b   = [[dot vi vj| vj <- b'] |  vi <- a]
+            where b' = transpose b
+
+fib n = head $ head $ power mul [[1, 0], [0, 1]] [[0, 1], [1, 1]] n
+
+*Main> roughly $ fib 1000000
+"1e208987"
+
+
+-------------------------------------------------------------------------------------------------------------------
+
+
+13.1
+
+
+foldExpr num app (Num x)        = num x
+foldExpr num app (App op e1 e2) = app op (foldExpr num app e1) (foldExpr num app e2)
+
+value :: Expr -> Value
+value = foldExpr id apply
+
+We'll fold using pairs of type (Bool, Value) accounting for the validity of a subexpression and
+its value in case it's valid (laziness makes sure apply is never called upon an invalid expression):
+
+allLegal = fst . foldExpr (\x -> (True, x)) (\op (b1, v1) (b2, v2) -> (b1 && b2 && legal op v1 v2, apply op v1 v2))
+
+
+-------------------------------------------------------------------------------------------------------------------
+
+
+13.2
+
+genExprs  :: [Int] -> [Expr]
+genExprs  [x] = [Num x]
+genExprs  xs  = [ev | (ys, zs) <- splits xs,
+                      ev1      <- genExprs  ys,
+                      ev2      <- genExprs  zs,
+                      ev       <- combine  ev1 ev2]
+
+combine  ev1 ev2 = [App Add ev1 ev2, 
+                    App Sub ev1 ev2,
+                    App Mul ev1 ev2,
+                    App Div ev1 ev2]
+
+*Main> length (genExprs [1 .. 6])
+967680

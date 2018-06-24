@@ -1,4 +1,4 @@
-Question 8.3
+﻿Question 8.3
 
 data Op = Add | Mul | Sub | Div | RSub | RDiv 
 
@@ -46,7 +46,7 @@ eval store expr = exec store (compileS expr)
 
 <=> {definition of exec}
 eval store expr = answer (foldl step (store, []) (compileS expr))
-				 where answer (store, [v]) = v
+                 where answer (store, [v]) = v
 
 If we could show that foldl step (store, []) (compileS expr) = (store, eval store expr)
 held true, then we'd be done, as answer (store, eval store expr) = eval store expr, by definition.
@@ -54,7 +54,7 @@ held true, then we'd be done, as answer (store, eval store expr) = eval store ex
 To prove this, we'll actually prove a slightly stronger result, namely:
 
 foldl step (store, stack) (compileS expr) = (store, eval store expr : stack)
-	
+    
 Proceed by induction on expr:
 
 
@@ -156,8 +156,8 @@ compileM env (r : free)       (Num n)      = printLoad r n
 compileM env (r : free)       (Var v)      = printMove r (env ‘at‘ v)
 compileM env (r0 : r1 : free) (Bin l op r) = compileM env (r0 : r1 : free) l ++
                                              compileM env (r1 : free)      r ++
-											 printOp op r0 r0 r1
-			 
+                                             printOp op r0 r0 r1
+             
 printLoad   r  n     = "ori $" ++ (show r)  ++ ", $0, "  ++ (show n)                        ++ "\n"
 printMove   r1 r2    = "add $" ++ (show r1) ++ ", $0, $" ++ (show r2)                       ++ "\n"
 printOp Add r1 r2 r3 = "add $" ++ (show r1) ++ ", $"     ++ (show r2) ++ ", $" ++ (show r3) ++ "\n"

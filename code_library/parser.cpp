@@ -1,10 +1,10 @@
 class InputReader {
   public:
-	InputReader() {
+    InputReader() {
         in = stdin;
         cursor = 0;
         fread(buffer, 1, SIZE, in);
-	}
+    }
     InputReader(const char *input_file) {
         in = fopen(input_file, "r");
         cursor = 0;
@@ -41,7 +41,7 @@ class OutputWriter {
     OutputWriter() {
         out = stdout;
         cursor = 0;
-	}
+    }
     OutputWriter(const char *output_file) {
         out = fopen(output_file, "w");
         cursor = 0;

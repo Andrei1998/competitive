@@ -1,7 +1,7 @@
 class InputReader {
   public:
 	InputReader() {
-		in = stdin;
+	    in = stdin;
         cursor = 0;
         fread(buffer, 1, SIZE, in);
 	}
@@ -39,7 +39,7 @@ class InputReader {
 class OutputWriter {
   public:
     OutputWriter() {
-		out = stdout;
+	    out = stdout;
         cursor = 0;
 	}
     OutputWriter(const char *output_file) {
@@ -74,3 +74,4 @@ class OutputWriter {
     char buffer[SIZE];
     int cursor;
 };
+

@@ -50,10 +50,9 @@ class MaxFlow {
     vector <int> index, dist;
 
     bool bfs() {
-        dist.clear();
-        dist.resize(N, 0);
-        queue <int> q;
+        dist.clear(), dist.resize(N, 0);
         dist[src] = 1;
+        queue <int> q;
         q.push(src);
         while (!q.empty()) {
             const int node = q.front(); q.pop();

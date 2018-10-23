@@ -67,8 +67,8 @@ autocmd FileType c,cpp imap <buffer> <F9> :w<CR>:!clear<CR>:make!<CR>:!echo ----
 
 " Java compilation and running
 autocmd FileType java setlocal makeprg=javac\ %
-autocmd Filetype java   map <buffer> <F9> :w<CR>:!clear<CR>:make!<CR>:!echo --------------------------------------------------------------------------------<CR>:java %:r <CR>
-autocmd Filetype java  imap <buffer> <F9> :w<CR>:!clear<CR>:make!<CR>:!echo --------------------------------------------------------------------------------<CR>:java %:r <CR>
+autocmd Filetype java   map <buffer> <F9> :w<CR>:!clear<CR>:make!<CR>:!echo --------------------------------------------------------------------------------<CR>:!java %:r <CR>
+autocmd Filetype java  imap <buffer> <F9> :w<CR>:!clear<CR>:make!<CR>:!echo --------------------------------------------------------------------------------<CR>:!java %:r <CR>
 
 " Python running
 autocmd FileType python map <buffer> <F9> :w<CR>:!clear<CR>:!time python3 % <CR>

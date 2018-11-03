@@ -7,6 +7,7 @@ set cc=90
 set autoindent
 set background=dark
 set mouse=a
+set noswapfile
 
 " Aliases for arrow keys
 map <ESC>OC <right>

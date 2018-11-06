@@ -1,6 +1,6 @@
 # Info
 
-## Small library for programming contests, in C++
+## C++ library for programming contests
 
 - [Dinic's Algorithm](code_library/dinic.cpp)
 - [Fast IO](code_library/parser.cpp)
@@ -12,6 +12,9 @@
 
 Carefully crafted examples to pinpoint somewhat unknown [Scala Language design choices](scala/binding_examples).
 
-Some are just standard OOP dynamic dispatch (i.e. they apply to Java as well).
+Some are just standard OOP features, so they apply to Java etc.
 
+## Competition Code
+
+[Code](problems) from some of the contests I wrote over the past few years.
 

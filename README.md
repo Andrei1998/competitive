@@ -10,7 +10,7 @@
 
 Carefully crafted examples to pinpoint somewhat unknown [Scala Language design choices](scala/binding_examples).
 
-Some are just standard OOP features, so they apply to Java etc.
+Some are just standard OOP features, so they also apply to Java etc.
 
 ## Competition Code
 

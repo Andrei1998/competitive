@@ -10,7 +10,8 @@
 
 ## Scala Educational
 
-[Carefully crafted examples to pinpoint somewhat unknown [Scala Language design choices](scala/binding_examples).]
+Carefully crafted examples to pinpoint somewhat unknown [Scala Language design choices](scala/binding_examples).
+
 Some are just standard OOP dynamic dispatch (i.e. they apply to Java as well).
 
 

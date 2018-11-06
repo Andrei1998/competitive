@@ -6,6 +6,8 @@ set expandtab
 set cc=90
 set autoindent
 set background=dark
+set mouse=a
+set noswapfile
 
 " Aliases for arrow keys
 map <ESC>OC <right>
@@ -58,20 +60,19 @@ imap <C-right> <ESC>:tabnext<CR>i
 noremap <up> g<up>
 noremap <down> g<down>
 
-" C/C++ compilation
-autocmd FileType c setlocal makeprg=gcc\ -g\ -O2\ -Wall\ %\ -o\ _%<\ -lm
-autocmd FileType cpp setlocal makeprg=g++\ -std=c++14\ -O2\ -Wall\ %\ -o\ _%<\ -lm
+" C/C++ compilation and running
+autocmd FileType c    setlocal makeprg=gcc\ -g\ -O2\ -Wall\ %\ -o\ _%<\ -lm
+autocmd FileType cpp  setlocal makeprg=g++\ -std=c++14\ -O2\ -Wall\ %\ -o\ _%<\ -lm
+autocmd FileType c,cpp  map <buffer> <F9> :w<CR>:!clear<CR>:make!<CR>:!echo --------------------------------------------------------------------------------<CR>:!time ./_%< <CR>
+autocmd FileType c,cpp imap <buffer> <F9> :w<CR>:!clear<CR>:make!<CR>:!echo --------------------------------------------------------------------------------<CR>:!time ./_%< <CR>
 
-autocmd FileType c,cpp map <buffer> <F8> :w<CR>:!clear<CR>:make!<CR>
-autocmd FileType c,cpp imap <buffer> <F8> <ESC>:w<CR>:!clear<CR>:make!<CR>
+" Java compilation and running
+autocmd FileType java setlocal makeprg=javac\ %
+autocmd Filetype java   map <buffer> <F9> :w<CR>:!clear<CR>:make!<CR>:!echo --------------------------------------------------------------------------------<CR>:!java %:r <CR>
+autocmd Filetype java  imap <buffer> <F9> :w<CR>:!clear<CR>:make!<CR>:!echo --------------------------------------------------------------------------------<CR>:!java %:r <CR>
 
-" Running C/C++
-autocmd FileType c,cpp map <buffer> <F9> :w<CR>:!clear<CR>:make!<CR>:!echo --------------------------------------------------------------------------------<CR>:!time ./_%< <CR>
-
-imap <F9> <ESC><F9>
-
-" Running Python
+" Python running
 autocmd FileType python map <buffer> <F9> :w<CR>:!clear<CR>:!time python3 % <CR>
 
-" Running Bash
+" Bash   running
 autocmd FileType bash,sh map <buffer> <F9> :w<CR>:!clear<CR>:!time ./% <CR>

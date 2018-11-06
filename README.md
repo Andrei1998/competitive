@@ -1,5 +1,3 @@
-# Info
-
 ## C++ library for programming contests
 
 - [Dinic's Algorithm](code_library/dinic.cpp)

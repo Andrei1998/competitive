@@ -103,39 +103,39 @@ DIV
 Distinguish three cases:
 
 1. d1 = d2:
-	In this case min (max d1 (d2 + 1)) (max (d1 + 1) d2) = 1 + d1 = 1 + d2
+    In this case min (max d1 (d2 + 1)) (max (d1 + 1) d2) = 1 + d1 = 1 + d2
 
-	This depth can be achieved by generating the following unexpanded code:
+    This depth can be achieved by generating the following unexpanded code:
 
-	SEQ [gen_expr e1;
-		 gen_expr e2;
-		 BINOP op]
+    SEQ [gen_expr e1;
+         gen_expr e2;
+         BINOP op]
 
     Where the maximum stack size is achieved during the evaluation of e2.
 
 2. d1 < d2:
-	In this case min (max d1 (d2 + 1)) (max (d1 + 1) d2) = d2
+    In this case min (max d1 (d2 + 1)) (max (d1 + 1) d2) = d2
 
-	This depth can be achieved by generating the following unexpanded code:
-	
-	SEQ [gen_expr e2;
-	     gen_expr e1;
-		 SWAP;
-		 BINOP op]
-	
-	Where the maximum stack size is achieved during the evaluation of e2.
+    This depth can be achieved by generating the following unexpanded code:
+    
+    SEQ [gen_expr e2;
+         gen_expr e1;
+         SWAP;
+         BINOP op]
+    
+    Where the maximum stack size is achieved during the evaluation of e2.
 
 3. d1 > d2
-	In this case min (max d1 (d2 + 1)) (max (d1 + 1) d2) = d1
+    In this case min (max d1 (d2 + 1)) (max (d1 + 1) d2) = d1
 
-	This depth can be achieved by generating the following unexpanded code:
-	
-	SEQ [gen_expr e1;
-	     gen_expr e2;
-		 BINOP op]
-	
-	Where the maximum stack size is achieved during the evaluation of e1.
-	
+    This depth can be achieved by generating the following unexpanded code:
+    
+    SEQ [gen_expr e1;
+         gen_expr e2;
+         BINOP op]
+    
+    Where the maximum stack size is achieved during the evaluation of e1.
+    
 let rec cost =
   function
       Constant x ->
@@ -148,38 +148,38 @@ let rec cost =
         let d1 = cost e1 in
         let d2 = cost e2 in
           min (max d1 (d2 + 1)) (max (d1 + 1) d2)
-	
+    
 
 For the proof part, proceed by structural induction.
 Distinguish between 3 cases:
 
-	(i)	  e matches either Constant x or Variable x.
-	In both of these, the number of operands is always 1. Since 1 < 2^N for all N >= 1,
-	but cost e = 1 <= N, the condition trivially holds true in these cases.
-	
-	(ii)  e matches Monop(w, e1).
-	Then, cost e = cost e1 and also the number of operands of e equals the number of operands of e1,
-	so we are done by invoking the inductive hypothesis directly.
-	
-	(iii) e matches Binop(w, e1, e2).
-	We'll prove the contrapositive:
-	i.e. If cost e > N then e has at least 2^N operands.
-	To show this, it's easiest to assume a fixed value for cost e = K
-	and show the tightest of the conclusions:
-	Namely, we'll show that if cost e = K, then e has at least 2^(K - 1) operands.
-	
-	Distinguish between 2 subcases (WLOG cost e1 >= cost e2):
-		1. cost e1 = cost e2 = K - 1:
-			Then by the inductive hypothesis e1 has at least 2^(K - 2) operands and
-			e2 has at least 2^(K - 2) operands. Thus e has at least 2 * 2^(K - 2)
-			operands, or 2^(K - 2), as required.
-		
-		2. cost e1 = K, cost e2 < K:
-			Then by the inductive hypothesis e1 has at least 2^(K - 1) operands,
-			and so e has at least 2^(K - 1) operands, as required.
-	
+    (i)      e matches either Constant x or Variable x.
+    In both of these, the number of operands is always 1. Since 1 < 2^N for all N >= 1,
+    but cost e = 1 <= N, the condition trivially holds true in these cases.
+    
+    (ii)  e matches Monop(w, e1).
+    Then, cost e = cost e1 and also the number of operands of e equals the number of operands of e1,
+    so we are done by invoking the inductive hypothesis directly.
+    
+    (iii) e matches Binop(w, e1, e2).
+    We'll prove the contrapositive:
+    i.e. If cost e > N then e has at least 2^N operands.
+    To show this, it's easiest to assume a fixed value for cost e = K
+    and show the tightest of the conclusions:
+    Namely, we'll show that if cost e = K, then e has at least 2^(K - 1) operands.
+    
+    Distinguish between 2 subcases (WLOG cost e1 >= cost e2):
+        1. cost e1 = cost e2 = K - 1:
+            Then by the inductive hypothesis e1 has at least 2^(K - 2) operands and
+            e2 has at least 2^(K - 2) operands. Thus e has at least 2 * 2^(K - 2)
+            operands, or 2^(K - 2), as required.
+        
+        2. cost e1 = K, cost e2 < K:
+            Then by the inductive hypothesis e1 has at least 2^(K - 1) operands,
+            and so e has at least 2^(K - 1) operands, as required.
+    
 -----------------------------------------------------------------------------------------
-	
+    
 (c)
 (* Quadratic complexity at worst, but fine in practice *)
 let rec gen_expr =
@@ -203,82 +203,82 @@ let rec gen_expr =
                   SWAP;   (* Requires VM support for this *)
                   BINOP w]
 
-				  
+                  
 -----------------------------------------------------------------------------------------
-				  
-				  
+                  
+                  
 2.4
 (a) One of the main flaws with this scheme is how it treats an else-less if statement as an
 if-else statement with empty else body. For example, consider how the following simple if
 statement:
 
-	if expr1 then 
-		...
-	end
+    if expr1 then 
+        ...
+    end
 
 gets translated into:
 
-	gen_cond expr1 lab1 lab2;
-	LABEL lab1;
-		...
-	JUMP lab3;
-	LABEL lab2;
-	LABEL lab3
+    gen_cond expr1 lab1 lab2;
+    LABEL lab1;
+        ...
+    JUMP lab3;
+    LABEL lab2;
+    LABEL lab3
 
 with a redundant label lab3 and a redundant jump to it, a single label lab2 would have sufficed.
 
 Now, consider a more elaborate example:
 
-	if expr1 then 
-		stmt1
-	else 
-		if expr2 then
-			stmt2
-		end
-	end
+    if expr1 then 
+        stmt1
+    else 
+        if expr2 then
+            stmt2
+        end
+    end
 
 which gets translated into:
 
-	gen_cond expr1 lab1 lab2
-	LABEL lab1;
-		gen_stmt stmt1
-	JUMP lab3;
-	LABEL lab2;
-		gen_cond expr2 lab4 lab5;
-		LABEL lab4;
-			gen_stmt stmt2
-		JUMP lab6;
-		LABEL lab5;
-		LABEL lab6
-	LABEL lab3
+    gen_cond expr1 lab1 lab2
+    LABEL lab1;
+        gen_stmt stmt1
+    JUMP lab3;
+    LABEL lab2;
+        gen_cond expr2 lab4 lab5;
+        LABEL lab4;
+            gen_stmt stmt2
+        JUMP lab6;
+        LABEL lab5;
+        LABEL lab6
+    LABEL lab3
 
 We get a similar problem, just amplified, with the horrifically inefficient ending sequence:
 
-	JUMP lab6;
-	LABEL lab5;
-	LABEL lab6;
-	LABEL lab3
+    JUMP lab6;
+    LABEL lab5;
+    LABEL lab6;
+    LABEL lab3
 
 Another nice optimization idea would be to create a translation function which is
 semantically equivalent to:
 
-	gen_cond_false expr1 label = 
-		let t = label() in 
-			SEQ [gen_cond expr1 t label;
-				 LABEL t]
+    gen_cond_false expr1 label = 
+        let t = label() in 
+            SEQ [gen_cond expr1 t label;
+                 LABEL t]
 
 Which would allow rewriting the code as:
 
-	gen_cond_false expr1 lab2
-		gen_stmt stmt1
-	JUMP lab3;
-	LABEL lab2;
-		gen_cond_false expr2 lab5;
-			gen_stmt stmt2
-		JUMP lab6;
-		LABEL lab5;
-		LABEL lab6
-	LABEL lab3
+    gen_cond_false expr1 lab2
+        gen_stmt stmt1
+    JUMP lab3;
+    LABEL lab2;
+        gen_cond_false expr2 lab5;
+            gen_stmt stmt2
+        JUMP lab6;
+        LABEL lab5;
+        LABEL lab6
+    LABEL lab3
 
 Allowing the use of less labels in the more trivial cases as well as tidying up the
 high level code structure.
@@ -292,23 +292,23 @@ This requires replacing all occurrences of one label by the other one.
 
 2. Sequences of the form
 
-	JUMP label
-	LABEL label
+    JUMP label
+    LABEL label
 
 get removed.
 
 These two optimizations alone turn the later code into:
 
-	gen_cond expr1 lab1 lab2
-	LABEL lab1;
-	gen_stmt stmt1
-	JUMP lab5;
-	LABEL lab2;
-	gen_cond expr2 lab4 lab5;
-	LABEL lab4;
-	gen_stmt stmt2
-	LABEL lab5;
-	
+    gen_cond expr1 lab1 lab2
+    LABEL lab1;
+    gen_stmt stmt1
+    JUMP lab5;
+    LABEL lab2;
+    gen_cond expr2 lab4 lab5;
+    LABEL lab4;
+    gen_stmt stmt2
+    LABEL lab5;
+    
 Most of the time also eliminating labels lab1 and lab4, in the spirit of gen_cond_false.
 
 
@@ -320,7 +320,7 @@ Most of the time also eliminating labels lab1 and lab4, in the spirit of gen_con
 (a) Abstract syntax:
 
 type stmt =
-	...
+    ...
   | WhileStmt of (expr * stmt) list
   | Loop of stmt
   | Exit
@@ -335,7 +335,7 @@ stmts:
   | EXIT                               { ExitStmt }
   
 while_elsif:
-	END                                { [] }
+    END                                { [] }
   | ELSIF expr DO stmts while_elsif    { ($2, $4) :: $5 }
   
 -----------------------------------------------------------------------------------------
@@ -345,18 +345,18 @@ while_elsif:
 let rec gen_stmt s exit_lab =
   match s with
       ...
-	| WhileStmt lst ->
-	  let init_lab = label () in
-	  let expand (e, s) =
-	    let lbl = label () and nxt_lab = label () in
-	    SEQ [gen_cond e lbl nxt_lab;
-			 gen_stmt s exit_lab
-		     JUMP init_lab;
-		     LABEL nxt_lab]
-	  in
-	    SEQ [LABEL init_lab;
-		     SEQ (List.map expand lst) ]
-	| LoopStmt body ->
+    | WhileStmt lst ->
+      let init_lab = label () in
+      let expand (e, s) =
+        let lbl = label () and nxt_lab = label () in
+        SEQ [gen_cond e lbl nxt_lab;
+             gen_stmt s exit_lab
+             JUMP init_lab;
+             LABEL nxt_lab]
+      in
+        SEQ [LABEL init_lab;
+             SEQ (List.map expand lst) ]
+    | LoopStmt body ->
       let lab1 = label () and lab2 = label () in
         SEQ [LABEL lab1;
              gen_stmt body lab2;
@@ -370,88 +370,88 @@ let rec gen_stmt s exit_lab =
 (c) First code:
 
 while x > y do
-	x := x - y
+    x := x - y
 elsif x < y do
-	y := y - x
+    y := y - x
 end
 
 Generated code would be (with some appropriate friendlier label names):
 
 LABEL init_lab1
-	
-	! gen_cond x > y lbl2 nxt_lab3;
-	LDLW -4;
-	LDLW -8;
-	JGT lbl2
-	JUMP nxt_lab3
-	
-	LABEL lbl2;
-	! gen_stmt x := x - y
-	LDLW -4;
-	LDLW -8
-	MINUS
-	STLW -4;
-	
-	JUMP init_lab1;
-	LABEL nxt_lab3;
-	
-	! gen_cond x < y lbl4 nxt_lab5
-	LDLW -4;
-	LDLW -8;
-	JLT lbl4;
-	JUMP nxt_lab5
-	
-	LABEL lbl4
-	! get_stmt y := y - x
-	LDLW -8;
-	LDLW -4;
-	MINUS;
-	STLW -8;
-	
-	JUMP init_lab1
-	LABEL nxt_lab5
+    
+    ! gen_cond x > y lbl2 nxt_lab3;
+    LDLW -4;
+    LDLW -8;
+    JGT lbl2
+    JUMP nxt_lab3
+    
+    LABEL lbl2;
+    ! gen_stmt x := x - y
+    LDLW -4;
+    LDLW -8
+    MINUS
+    STLW -4;
+    
+    JUMP init_lab1;
+    LABEL nxt_lab3;
+    
+    ! gen_cond x < y lbl4 nxt_lab5
+    LDLW -4;
+    LDLW -8;
+    JLT lbl4;
+    JUMP nxt_lab5
+    
+    LABEL lbl4
+    ! get_stmt y := y - x
+    LDLW -8;
+    LDLW -4;
+    MINUS;
+    STLW -8;
+    
+    JUMP init_lab1
+    LABEL nxt_lab5
 
 Second code:
 
 loop
-	if x > y then
-		x := x - y
-	elsif x < y then
-		y := y - x
-	else
-		exit
-	end
+    if x > y then
+        x := x - y
+    elsif x < y then
+        y := y - x
+    else
+        exit
+    end
 end
 
 Generated code would be (with some appropriate friendlier label names):
 
 LABEL init_lab1
-	! gen_cond x > y lab3 lab4
-	LDGW -4
-	LDGW -8
-	JGT lab3
-	JUMP lab4
-	
-	LABEL lab3
-		! gen_stmt x := x - y
-		LDLW -4
-		LDLW -8
-		MINUS
-		STLW -4
-	JUMP lab5
-	LABEL lab4
-		! gen_cond x < y lab6 lab7
-		LDGW -4
-		LDGW -8
-		JLT lab6
-		JUMP lab7
-		
-		LABEL lab6
-		JUMP lab8
-		LABEL lab7
-			JUMP lab2
-		LABEL lab8
-	LABEL lab5
+    ! gen_cond x > y lab3 lab4
+    LDGW -4
+    LDGW -8
+    JGT lab3
+    JUMP lab4
+    
+    LABEL lab3
+        ! gen_stmt x := x - y
+        LDLW -4
+        LDLW -8
+        MINUS
+        STLW -4
+    JUMP lab5
+    LABEL lab4
+        ! gen_cond x < y lab6 lab7
+        LDGW -4
+        LDGW -8
+        JLT lab6
+        JUMP lab7
+        
+        LABEL lab6
+        JUMP lab8
+        LABEL lab7
+            JUMP lab2
+        LABEL lab8
+    LABEL lab5
 JUMP init_lab1
 LABEL lab2
 
@@ -461,23 +461,23 @@ LABEL lab2
 
 (1) Duplicate labels (at the same place in the code), e.g.:
 
-	LABEL lab8
-	Label lab5
+    LABEL lab8
+    Label lab5
 
 Which should grouped into equivalence classes by the peephole optimizer, thus turning the above into:
 
-	LABEL lab5
+    LABEL lab5
 
 and changing all occurrences of lab8 into occurrences of lab5.
 
 (2) and "redirection" jumps, e.g.:
 
-	LABEL lab5
-	JUMP init_lab1
+    LABEL lab5
+    JUMP init_lab1
 
 Which could be optimized by removing lab5 and changing all occurrences of JUMP lab5 into:
 
-	JUMP init_lab1
+    JUMP init_lab1
 
 These two optimizations remove most of the inefficiency of the second generated code.
 
@@ -494,8 +494,8 @@ type expr =
 
 There are ambiguities such as:
 
-	if i >= 0 then j else (j + 1) vs.
-	(if i >= 0 then j else j) + 1
+    if i >= 0 then j else (j + 1) vs.
+    (if i >= 0 then j else j) + 1
 
 which should be correctly taken care of. To do this, we'll always parse the bracket-less
 version of the above two expressions into the former. In other words, the conditional
@@ -551,7 +551,7 @@ factor_not_end_if :
 let rec gen_expr =
   function
       ...
-	| IfExpr (cond, thn, els) ->
+    | IfExpr (cond, thn, els) ->
         let els_lab = label () and ext_lab = label () in
           SEQ [gen_expr cond;
                CONST 0;
@@ -565,7 +565,7 @@ let rec gen_expr =
 let rec gen_cond e tlab flab =
   match e with
       ...
-	| IfExpr (cond, thn, els) ->
+    | IfExpr (cond, thn, els) ->
         let els_lab = label () and ext_lab = label () in
         SEQ [gen_expr cond;
              CONST 0;
@@ -575,122 +575,122 @@ let rec gen_cond e tlab flab =
              LABEL els_lab;
              gen_cond els tlab flab;
              LABEL ext_lab]
-			 
+             
 -----------------------------------------------------------------------------------------
 
 (c) The translation of:
 
-	if (if i >= 0 then a[i] > x else false) then
-		i := i+1
-	end
+    if (if i >= 0 then a[i] > x else false) then
+        i := i+1
+    end
 
 is:
 
-	LDGW i
-	CONST 0
-	GEQ
-	CONST 0
-	JEQ els_lab
-	
-	GLOBAL a
-	LDGW i
-	CONST 4
-	TIMES
-	OFFSET
-	LOADW
-	LDGW x
-	
-	JGT L1
-	JUMP L2
-	
-	JUMP ext_lab
-	LABEL els_lab
-	JUMP L2
-	LABEL ext_lab
-	
-	LABEL L1
-	LDGW i
-	CONST 1
-	PLUS
-	STGW i
-	JUMP L3
-	LABEL L2
-	LABEL L3
+    LDGW i
+    CONST 0
+    GEQ
+    CONST 0
+    JEQ els_lab
+    
+    GLOBAL a
+    LDGW i
+    CONST 4
+    TIMES
+    OFFSET
+    LOADW
+    LDGW x
+    
+    JGT L1
+    JUMP L2
+    
+    JUMP ext_lab
+    LABEL els_lab
+    JUMP L2
+    LABEL ext_lab
+    
+    LABEL L1
+    LDGW i
+    CONST 1
+    PLUS
+    STGW i
+    JUMP L3
+    LABEL L2
+    LABEL L3
 
 While the translation of:
 
-	if i >= 0 and a[i] > x then
-		i := i + 1
-	end
+    if i >= 0 and a[i] > x then
+        i := i + 1
+    end
 
 is:
 
-	LDGW i
-	CONST 0
-	JGEQ l
-	JUMP L2
-	LABEL l
-	
-	GLOBAL a
-	LDGW i
-	CONST 4
-	TIMES
-	OFFSET
-	LOADW
-	LDGW x
-	
-	JGT L1
-	JUMP L2	
-	
-	LABEL L1
-	LDGW i
-	CONST 1
-	PLUS
-	STGW i
-	JUMP L3
-	LABEL L2
-	LABEL L3
-	
+    LDGW i
+    CONST 0
+    JGEQ l
+    JUMP L2
+    LABEL l
+    
+    GLOBAL a
+    LDGW i
+    CONST 4
+    TIMES
+    OFFSET
+    LOADW
+    LDGW x
+    
+    JGT L1
+    JUMP L2    
+    
+    LABEL L1
+    LDGW i
+    CONST 1
+    PLUS
+    STGW i
+    JUMP L3
+    LABEL L2
+    LABEL L3
+    
 There are a few peephole optimizations one may do in order to make the first variant
 as efficient as the second:
 
 1. Turn 
 
-	GEQ
-	CONST 0
-	JEQ els_lab
+    GEQ
+    CONST 0
+    JEQ els_lab
 
 into
 
-	JLT els_lab
+    JLT els_lab
 
-	
+    
 2. Merge adjacent labels into a single label and remove unused labels.
 
 3. Notice the construct:
 
-	LABEL els_lab
-	JUMP L2
-	
+    LABEL els_lab
+    JUMP L2
+    
 This shows that all instances of
-	
-	JUMP els_lab
+    
+    JUMP els_lab
 
 can be turned into 
-	
-	JUMP L2
+    
+    JUMP L2
 
 And thus els_lab can be eliminated from the code.
 
 4. Instances of the form:
 
-	JUMP L1
-	JUMP L2
+    JUMP L1
+    JUMP L2
 
 can be turned into:
 
-	JUMP L1
-	
+    JUMP L1
+    
 These 4 optimizations have the effect of optimizing both codes and vastly decreasing
 the gap between them.
 
@@ -722,13 +722,13 @@ There are quite a few changes to be made:
 In tree.ml / tree.mli:
 
 and stmt = 
-	...
+ ...
   | LocalInStmt of decl list * stmt
 
 let rec fStmt = 
   function
-	  ...
-	| LocalInStmt (ds, s) ->
+      ...
+    | LocalInStmt (ds, s) ->
         fMeta "LocalInStmt_($, $)" [fList(fDecl) ds; fStmt s]
     
 
@@ -739,7 +739,7 @@ let kwtable =
   make_hash 64
     [ ... ("local", LOCAL); ("in", IN) ]
 
-	
+    
 In parser.mly:
 
 
@@ -798,8 +798,8 @@ In kgen.ml:
 
 let rec gen_stmt =
   function
-	  ...
-	| LocalInStmt (ds, s) ->
+      ...
+    | LocalInStmt (ds, s) ->
       List.iter gen_decl ds;  (* Iterative style, like the rest of directive
                                  code generation *)
       gen_stmt s
@@ -860,7 +860,7 @@ Doing a perfect job is certainly at least NP-complete. Consider the following co
 
 ...
 if P(X) then
-	Y := 0;
+    Y := 0;
 end;
 print Y;
 ...
@@ -894,27 +894,27 @@ and rec check_init_stmt =
   function
     ...
   | Assign (v, e) ->
-	let d = get_def_var_in expr v in
+    let d = get_def_var_in expr v in
       add_occ d;
-	  check_init_expr e;
+      check_init_expr e;
   | Skip ->
-	  ()
+      ()
   | Print e ->
       check_init_expr e
   | WhileStmt (test, body) ->
-	  check_init_expr test;
-	  check_init_stmt body
+      check_init_expr test;
+      check_init_stmt body
     ...
 
 and rec check_init_expr =
   function
     Variable x ->
-	  if not (check_occ x) then
-	    failwith "uninitialized variable detected"
-	  else
-	    ()
+      if not (check_occ x) then
+        failwith "uninitialized variable detected"
+      else
+        ()
   | Constant x ->
       ()
   | Monop (w, e1) ->
-	  check_init_expr e1;
-	  check_init_expr e2
+      check_init_expr e1;
+      check_init_expr e2

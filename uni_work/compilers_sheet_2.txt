@@ -7,6 +7,24 @@ Andrei-Costin Constantinescu
 
 2.1
 
+Binary search:
+
+begin
+  x := 200000000;
+  l := 1; r := x;
+  while l <= r do
+    mid := (l + r) div 2;
+    if mid <= x div mid then
+        l := mid + 1
+    else
+        r := mid - 1
+    end
+  end;
+  print l - 1; newline
+end.
+
+Translation to KEIKO:
+
 MODULE Main 0 0       ! Program is named (module) Main
 IMPORT Lib 0          ! Program uses library routines from module Lib
 ENDHDR                ! Marks the end of the header directives list

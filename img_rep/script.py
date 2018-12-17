@@ -67,8 +67,8 @@ def assemble_tableau(img, row, col, lspan, cspan):
 def predict_sum(t):
     n, m, c = t.shape
     sum, cnt = np.zeros(3), 0
-    for i in range(0, n):
-        for j in range(0, m):
+    for i in range(n):
+        for j in range(m):
             if t[i][j][0] > 0 or t[i][j][1] > 0 or t[i][j][2] > 0:
                 sum += t[i][j]
                 cnt += 1    
@@ -82,8 +82,8 @@ def predict_gauss(t):
     n, m, c = t.shape
     mid_i, mid_j = (n - 1) // 2, (m - 1) // 2
     sum, cnt = 0.0, 0.0
-    for i in range(0, n):
-        for j in range(0, m):
+    for i in range(n):
+        for j in range(m):
             if t[i][j][0] > 0 or t[i][j][1] > 0 or t[i][j][2] > 0:
                 dist_sq = (i - mid_i) * (i - mid_i) + (j - mid_j) * (j - mid_j)
                 w = exp(-dist_sq / 2)
@@ -96,6 +96,7 @@ def predict_gauss(t):
     
 # Restore damaged image, returning image as new NumPy array
 def restore_img(img, predict): 
+    print("Restoring with " + str(predict.__name__) + " ...")
     n, m, c = img.shape
     restored_img = np.array(img)
     last = -1
@@ -134,6 +135,6 @@ def restore_all(predict, percent, show = False):
             write_array_to_disk(output_file, restored_img)    
             print("Successful!!!\n")
 
-damage_percent = 70        
+damage_percent = 70
 damage_all(damage_percent)
 restore_all(predict_gauss, damage_percent)

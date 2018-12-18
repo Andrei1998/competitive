@@ -35,7 +35,7 @@ def write_array_to_disk(name, img, show = False):
 # Iterate all files matching "img/*.*", remove percent%
 # of their pixels and save the results as "damaged_img/*.bmp"
 def damage_all(percent):
-   directory = "damaged_img" + str(percent)
+   directory = "damaged_img_" + str(percent)
    if not os.path.exists(directory):
        print("Creating directory " + directory + " ...")
        os.makedirs(directory)
@@ -96,7 +96,6 @@ def predict_gauss(t):
     
 # Restore damaged image, returning image as new NumPy array
 def restore_img(img, predict): 
-    print("Restoring with " + str(predict.__name__) + " ...")
     n, m, c = img.shape
     restored_img = np.array(img)
     last = -1
@@ -117,24 +116,25 @@ def restore_img(img, predict):
 # Iterate all files matching "damaged_img$percent/*.bmp", restore
 # colors of black pixels and save the results as "restored_img$percent/*.bmp"
 def restore_all(predict, percent, show = False):
-    directory = "restored_img" + str(percent)
+    directory = "restored_img_" + str(predict.__name__) + "_" + str(percent)
     if not os.path.exists(directory):
        print("Creating directory " + directory + " ...")
        os.makedirs(directory)
        print("Successful!!!\n")
-    for file in glob.glob("damaged_img" + str(percent) + "/*.bmp"):
-        print("Restoring " + file + " ...")        
-        output_file = "restored_img" + file[11:]
+    for file in glob.glob("damaged_img_" + str(percent) + "/*.bmp"):
+        print("Restoring " + file + " ...")
+        output_file = "restored_img_" + str(predict.__name__) + file[11:]
         if os.path.exists(output_file):
             print("File " + output_file + " already exists!!!\n")
         else:        
             img = read_img_to_array(file)
+            print("Restoring with " + str(predict.__name__) + " ...")
             restored_img = restore_img(img, predict)
             if show:
                 Image.fromarray(restored_img).show()
             write_array_to_disk(output_file, restored_img)    
             print("Successful!!!\n")
 
-damage_percent = 70
+damage_percent = 95
 damage_all(damage_percent)
 restore_all(predict_gauss, damage_percent)

@@ -7,10 +7,12 @@ from random import shuffle
 from PIL import Image
 import numpy as np
 
+
 # Read image from disk to NumPy array
-def read_img_to_array(name):
-    img = Image.open(name)
+def read_img_to_array(file):
+    img = Image.open(file)
     return np.array(img)
+
 
 # Remove (turn into black) percent% pixels of an image
 def damage_image(img, percent):    
@@ -25,6 +27,7 @@ def damage_image(img, percent):
             img[a][b][c] = 0
     return img
 
+
 # Write NumPy-represented 3D RGB array as BMP file
 def write_array_to_disk(name, img, show = False):
     img = Image.fromarray(img, 'RGB')
@@ -32,17 +35,18 @@ def write_array_to_disk(name, img, show = False):
         img.show()
     img.save(name, "BMP")  
 
+
 # Iterate all files matching "img/*.*", remove percent%
 # of their pixels and save the results as "damaged_img/*.bmp"
 def damage_all(percent):
-   directory = "damaged_img_" + str(percent)
+   directory = "data/damaged_img_" + str(percent)
    if not os.path.exists(directory):
        print("Creating directory " + directory + " ...")
        os.makedirs(directory)
        print("Successful!!!\n")
-   for file in glob.glob("img/*.*"):
+   for file in glob.glob("data/img/*.*"):
         print("Damaging " + file + " ...")
-        output_file = directory + file[3:-4] + ".bmp"
+        output_file = directory + file[8:-4] + ".bmp" # bug if extension is not 3 chars long
         if os.path.exists(output_file):
             print("File " + output_file + " already exists!!!\n")
         else:        
@@ -50,7 +54,8 @@ def damage_all(percent):
             img = damage_image(img, percent)
             write_array_to_disk(output_file, img) # bug: if extension is not 3 chars long
             print("Successful!!!\n")
-       
+    
+
 # Get a 2 * lspan + 1 by 2 * cspan + 1 pixel tableau centered at (row, col)
 # Out of bounds pixels become (0, 0, 0)
 def assemble_tableau(img, row, col, lspan, cspan):
@@ -63,6 +68,7 @@ def assemble_tableau(img, row, col, lspan, cspan):
                 mat[i + lspan][j + cspan] = img[l][c]
     return mat
     
+
 # Average of non-black pixels in tableau
 def predict_sum(t):
     n, m, c = t.shape
@@ -76,7 +82,8 @@ def predict_sum(t):
         return np.zeros(3)
     else:
         return sum / cnt
-        
+    
+
 # Gaussian average of non-black pixels in tableau
 def predict_gauss(t):
     n, m, c = t.shape
@@ -94,6 +101,7 @@ def predict_gauss(t):
     else:
         return sum / cnt
     
+
 # Restore damaged image, returning image as new NumPy array
 def restore_img(img, predict): 
     n, m, c = img.shape
@@ -113,17 +121,18 @@ def restore_img(img, predict):
     sys.stdout.flush()
     return restored_img
 
+    
 # Iterate all files matching "damaged_img$percent/*.bmp", restore
 # colors of black pixels and save the results as "restored_img$percent/*.bmp"
-def restore_all(predict, percent, show = False):
-    directory = "restored_img_" + str(predict.__name__) + "_" + str(percent)
+def restore_all(predict, percent, show=False):
+    directory = "data/restored_img_" + str(predict.__name__) + "_" + str(percent)
     if not os.path.exists(directory):
        print("Creating directory " + directory + " ...")
        os.makedirs(directory)
        print("Successful!!!\n")
-    for file in glob.glob("damaged_img_" + str(percent) + "/*.bmp"):
+    for file in glob.glob("data/damaged_img_" + str(percent) + "/*.bmp"):
         print("Restoring " + file + " ...")
-        output_file = "restored_img_" + str(predict.__name__) + file[11:]
+        output_file = "data/restored_img_" + str(predict.__name__) + file[16:]
         if os.path.exists(output_file):
             print("File " + output_file + " already exists!!!\n")
         else:        
@@ -134,7 +143,12 @@ def restore_all(predict, percent, show = False):
                 Image.fromarray(restored_img).show()
             write_array_to_disk(output_file, restored_img)    
             print("Successful!!!\n")
-
-damage_percent = 95
-damage_all(damage_percent)
-restore_all(predict_gauss, damage_percent)
+    
+    
+def main():
+    damage_percent = 95
+    damage_all(damage_percent)
+    restore_all(predict_gauss, damage_percent)
+    
+if __name__ == "__main__":
+    main()

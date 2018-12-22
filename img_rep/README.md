@@ -19,7 +19,7 @@ pip install -r requirements.txt
 
 Consider the non-damaged image data/img/dog1.jpg:
 
-![image could not load|512, 20%](data/img/dog1.jpg =400x266)
+<img src="data/img/dog1.jpg" height="400" width="266" alt="image could not load">
 
 By blackening 70 percent of its pixels ("damaging" it) we get data/damaged_img_70/dog1.bmp:
 

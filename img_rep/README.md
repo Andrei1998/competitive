@@ -1,10 +1,15 @@
-# Image RePainting
+# Image RePaint
 
-Python script for performing image inpainting of dead pixels.
+Python script for image [inpainting](https://en.wikipedia.org/wiki/Inpainting) of dead pixels.
+Supports multiple block based recovery modes:
+
+* Arithmetic average of non-dead pixels 
+* [Gaussian](https://en.wikipedia.org/wiki/Gaussian_blur#Mathematics) average of non-dead pixels
+* WIP: [Orthogonal Matching Pursuit](https://en.wikipedia.org/wiki/Matching_pursuit)
 
 ### Prerequisites
 
-NumPy and PIL (i.e. Pillow) need to be installed in order for the script to work properly. Install them by running this command from the project directory after cloning the repository:
+NumPy and PIL (i.e. Pillow) need to be installed in order for the script to work properly. Install them by running this command from the project directory:
 
 ```
 pip install -r requirements.txt
@@ -12,15 +17,15 @@ pip install -r requirements.txt
 
 ### Example
 
-Suppose we start with this (non-damaged) image placed in the data/img directory:
+Consider the non-damaged image data/img/dog1.jpg:
 
 ![image could not load](data/img/dog1.jpg)
 
-Then a 70 percent damaged image would be:
+By blackening $70$ percent of its pixels ("damaging" it) we get data/damaged_img_70/dog1.bmp:
 
 ![image could not load](data/damaged_img_70/dog1.bmp)
 
-Attempting to restore the initial dog1 image using the Gaussian Averaging Block Algorithm yields:
+Attempting to restore the initial image using the Gaussian Averaging Algorithm we get data/restored_img_predict_gauss_70/dog1.bmp:
 
 ![image could not load](data/restored_img_predict_gauss_70/dog1.bmp)
 
@@ -31,8 +36,8 @@ Attempting to restore the initial dog1 image using the Gaussian Averaging Block 
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
 
 ## Acknowledgments
 
-* [README template](https://gist.github.com/PurpleBooth/109311bb0361f32d87a2 )
+* [README template](https://gist.github.com/PurpleBooth/109311bb0361f32d87a2)

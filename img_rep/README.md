@@ -1,4 +1,4 @@
-# Project Title
+# Image RePainting
 
 Python script for performing image inpainting of dead pixels.
 
@@ -12,21 +12,17 @@ pip install -r requirements.txt
 
 ### Example
 
-Suppose we start with this image:
+Suppose we start with this (non-damaged) image placed in the data/img directory:
 
-![alt text](data/img/dog1.jpg)
+![image could not load](data/img/dog1.jpg)
 
-```
-Give the example
-```
+Then a 70 percent damaged image would be:
 
-And repeat
+![image could not load](data/damaged_img_70/dog1.bmp)
 
-```
-until finished
-```
+Attempting to restore the initial dog1 image using the Gaussian Averaging Block Algorithm yields:
 
-End with an example of getting some data out of the system or using it for a little demo
+![image could not load](data/restored_img_predict_gauss_70/dog1.bmp)
 
 ## Built With
 

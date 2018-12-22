@@ -25,7 +25,7 @@ By blackening 70 percent of its pixels ("damaging" it) we get data/damaged_img_7
 
 <img src="data/damaged_img_70/dog1.bmp" width="400" height="266" alt="image could not load">
 
-Attempting to restore the initial image using the Gaussian Averaging Algorithm we get data/restored_img_predict_gauss_70/dog1.bmp:
+Attempting to restore the image using the Gaussian Averaging Mode we get data/restored_img_predict_gauss_70/dog1.bmp:
 
 <img src="data/restored_img_predict_gauss_70/dog1.bmp" width="400" height="266" alt="image could not load">
 

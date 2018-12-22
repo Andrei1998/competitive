@@ -19,15 +19,15 @@ pip install -r requirements.txt
 
 Consider the non-damaged image data/img/dog1.jpg:
 
-<img src="data/img/dog1.jpg" height="400" width="266" alt="image could not load">
+<img src="data/img/dog1.jpg" width="400" height="266" alt="image could not load">
 
 By blackening 70 percent of its pixels ("damaging" it) we get data/damaged_img_70/dog1.bmp:
 
-![image could not load](data/damaged_img_70/dog1.bmp)
+<img src="data/damaged_img_70/dog1.bmp" width="400" height="266" alt="image could not load">
 
 Attempting to restore the initial image using the Gaussian Averaging Algorithm we get data/restored_img_predict_gauss_70/dog1.bmp:
 
-![image could not load](data/restored_img_predict_gauss_70/dog1.bmp)
+<img src="data/restored_img_predict_gauss_70/dog1.bmp" width="400" height="266" alt="image could not load">
 
 ## Built With
 

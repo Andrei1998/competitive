@@ -45,7 +45,7 @@ add5 a b c =
 -- 200
 -- 213
 
--- Here's code that find the sum of the odd elements of a read array
+-- Here's code that finds the sum of the odd elements of a read array
 
 f = sum . (filter odd)
 

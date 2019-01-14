@@ -1,3 +1,4 @@
+img/*
 data/damaged_img*/*
 data/restored_img*/*
 !data/img/dog1.jpg

@@ -146,7 +146,7 @@ def restore_all(predict, percent, show=False):
     
     
 def main():
-    damage_percent = 95
+    damage_percent = 70
     damage_all(damage_percent)
     restore_all(predict_gauss, damage_percent)
     

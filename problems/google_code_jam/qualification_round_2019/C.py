@@ -22,4 +22,4 @@ for t in range(1, T + 1):
     primes = list(set(sorted(primes)))
     
     nrs = [len([1 for q in primes if q < i]) for i in p]
-    print(''.join( [chr(ord('A') + x) for x in nrs]))
+    print(''.join([chr(ord('A') + x) for x in nrs]))

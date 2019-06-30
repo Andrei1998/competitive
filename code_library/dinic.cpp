@@ -88,6 +88,7 @@ class MaxFlow {
         return res;
     }
     T dinic() {
+        assert(src != dest);
         T flow = 0;
         while (bfs()) {
             for (int i = 0; i < N; ++i)

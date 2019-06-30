@@ -14,7 +14,11 @@ class MaxFlow {
     int getDest() { return dest; }
 
     void addEdge(int from, int to, T forwardCap, T backwardCap = 0) {
-        //assert(0 <= from && from < N && 0 <= to && to < N);
+        // Asserts
+        assert(from != to);
+        assert(0 <= from && from < N && 0 <= to && to < N);
+        
+        // Adds
         edges.emplace_back(from, to, 0, forwardCap);
         edges.emplace_back(to, from, 0, backwardCap);
         graph[from].push_back(edges.size() - 2);

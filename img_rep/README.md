@@ -17,7 +17,7 @@ pip install -r requirements.txt
 
 ### Example
 
-Non-damaged image data/img/dog1.jpg:
+Non-damaged image (data/img/dog1.jpg):
 
 <img src="data/img/dog1.jpg" width="400" height="266" alt="image could not load">
 

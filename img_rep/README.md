@@ -17,15 +17,15 @@ pip install -r requirements.txt
 
 ### Example
 
-Consider the non-damaged image data/img/dog1.jpg:
+Non-damaged image data/img/dog1.jpg:
 
 <img src="data/img/dog1.jpg" width="400" height="266" alt="image could not load">
 
-By blackening 70 percent of its pixels ("damaging" it) we get data/damaged_img_70/dog1.bmp:
+Blacken 70 percent of its pixels:
 
 <img src="data/damaged_img_70/dog1.bmp" width="400" height="266" alt="image could not load">
 
-Attempting to restore the image using the Gaussian Averaging Mode we get data/restored_img_predict_gauss_70/dog1.bmp:
+Attempt to restore the image using Gaussian Averaging:
 
 <img src="data/restored_img_predict_gauss_70/dog1.bmp" width="400" height="266" alt="image could not load">
 

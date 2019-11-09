@@ -7,6 +7,8 @@ set cc=90
 set autoindent
 set background=dark
 set autoread
+set mouse=a
+set hlsearch
 
 " Aliases for arrow keys
 map <ESC>OC <right>

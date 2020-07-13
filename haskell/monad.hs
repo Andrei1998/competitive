@@ -55,3 +55,5 @@ main = do
 
 -- Notice the usage of show, read and lines (non-monadic functions) together with
 -- getContents and putStrLn (monadic functions)
+
+-- Small cosmetic change.

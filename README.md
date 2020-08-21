@@ -15,8 +15,3 @@ Some are just standard OOP features, so they also apply to Java etc.
 ## Competition Code
 
 [Code](problems) from contests I wrote over the past few years.
-
-## Image RePaint
-
-Computer Vision project in Python.
-See [Readme](img_rep) for details.

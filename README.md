@@ -6,10 +6,9 @@
 - [Arbitrary Substring Hasher](code_library/hasher.cpp)
 - [Fast Fourier Transformation](code_library/fft.cpp)
 
-## 3rd Year Project
-
-Final BA in Computer Science dissertation, titled 'On the Complexity of the Chamberlin–Courant Rule Under Generalized Single-Crossing Preferences'.
-Supervised by Edith Elkind, see [full text](paper.pdf). Awarded with the G-Research Prize for best project in Computer Science.
+## 'On the Complexity of the Chamberlin–Courant Rule Under Generalized Single-Crossing Preferences'
+Awarded with the G-Research Prize for best project in Computer Science.
+Final BA in Computer Science dissertation, supervised by [Edith Elkind](https://scholar.google.com/citations?user=MsGRzsoAAAAJ&hl=en), see the [full text](paper.pdf).
 
 ## Scala Educational
 

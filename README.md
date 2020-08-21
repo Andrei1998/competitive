@@ -7,9 +7,10 @@
 - [Fast Fourier Transformation](code_library/fft.cpp)
 
 ## 'On the Complexity of the Chamberlin–Courant Rule Under Generalized Single-Crossing Preferences'
-Awarded with the G-Research Prize for best project in Computer Science.
 
-Final BA in Computer Science dissertation, supervised by [Edith Elkind](https://scholar.google.com/citations?user=MsGRzsoAAAAJ&hl=en), see the [full text](paper.pdf).
+See the [full text](paper.pdf). Awarded with the G-Research Prize for best project in Computer Science.
+
+Final BA in Computer Science dissertation, supervised by [Edith Elkind](https://scholar.google.com/citations?user=MsGRzsoAAAAJ&hl=en).
 
 ## Scala Educational
 

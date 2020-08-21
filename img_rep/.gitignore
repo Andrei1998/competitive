@@ -1,6 +1,0 @@
-data/img/*
-data/damaged_img*/*
-data/restored_img*/*
-!data/img/dog1.jpg
-!data/damaged_img_70/dog1.bmp
-!data/restored_img_predict_gauss_70/dog1.bmp
